@@ -398,7 +398,6 @@ try:
              posts, files, answers, practices, uploaded, readings, lectures, assigned,\
              lecture_follows_reading, reading_for_assignment, questions")
 
-
  #create and fille users, students, and professors
  cur.execute("CREATE TABLE users(\
                 email        VARCHAR(50) PRIMARY KEY,\
@@ -408,13 +407,17 @@ try:
                 school        VARCHAR(50))")
  
  cur.execute("CREATE TABLE students(\
-                email        VARCHAR(50) PRIMARY KEY REFERENCES users(email),\
-                year        INT,\
+                email        VARCHAR(50) PRIMARY KEY REFERENCES users(email)\
+                                                       ON DELETE CASCADE\
+                                                       ON UPDATE CASCADE,\
+                year        INT CHECK (year=2013 OR year=2014 OR year=2015 OR year=2016),\
                 major        VARCHAR(20),\
                 answerID    INT)")
  
  cur.execute("CREATE TABLE professors(\
-                email        VARCHAR(50) PRIMARY KEY REFERENCES users(email),\
+                email        VARCHAR(50) PRIMARY KEY REFERENCES users(email)\
+                                                       ON DELETE CASCADE\
+                                                       ON UPDATE CASCADE,\
                 hours        VARCHAR(100),\
                 office        VARCHAR(100))")
  usersList = populateUser(cur)
@@ -438,25 +441,41 @@ try:
 
  #create and fill teaches, takes, and assignments
  cur.execute("CREATE TABLE teaches(\
-                email        VARCHAR(50) REFERENCES users(email),\
-                CRN        VARCHAR(300) REFERENCES sections(CRN),\
+                email        VARCHAR(50) REFERENCES users(email)\
+                                           ON DELETE CASCADE\
+                                           ON UPDATE CASCADE,\
+                CRN        VARCHAR(300) REFERENCES sections(CRN)\
+                                           ON DELETE CASCADE\
+                                           ON UPDATE CASCADE,\
                 PRIMARY KEY(email, CRN))")
  cur.execute("CREATE TABLE takes(\
-                email        VARCHAR(50) REFERENCES users(email),\
-                CRN        VARCHAR(300) REFERENCES sections(CRN),\
+                email        VARCHAR(50) REFERENCES users(email)\
+                                           ON DELETE CASCADE\
+                                           ON UPDATE CASCADE,\
+                CRN        VARCHAR(300) REFERENCES sections(CRN)\
+                                           ON DELETE CASCADE\
+                                           ON UPDATE CASCADE,\
                 PRIMARY KEY(email, CRN))")
  cur.execute("CREATE TABLE assignments(\
                 assignmentID    INT PRIMARY KEY,\
                 name        VARCHAR(300),\
                 deadline    VARCHAR(50),\
                 description    TEXT,\
-                assigner_email    VARCHAR(50) REFERENCES users(email),\
-                CRN        VARCHAR(300) REFERENCES sections(CRN))")
+                assigner_email    VARCHAR(50) REFERENCES users(email)\
+                                           ON DELETE CASCADE\
+                                           ON UPDATE CASCADE,\
+                CRN        VARCHAR(300) REFERENCES sections(CRN)\
+                                           ON DELETE SET NULL\
+                                           ON UPDATE SET NULL)")
 
  cur.execute("CREATE TABLE assigned(\
-                  assignmentID INT REFERENCES assignments(assignmentID),\
-                  email    VARCHAR(50) REFERENCES users(email),\
-                  grade    DOUBLE PRECISION,\
+                  assignmentID INT REFERENCES assignments(assignmentID)\
+                                           ON DELETE CASCADE\
+                                           ON UPDATE CASCADE,\
+                  email    VARCHAR(50) REFERENCES users(email)\
+                                           ON DELETE SET NULL\
+                                           ON UPDATE SET NULL,\
+                  grade    DOUBLE PRECISION CHECK (grade>=0.0),\
                   submit_time  DATE,\
                   PRIMARY KEY (assignmentID, email))")
 
@@ -477,8 +496,12 @@ try:
 
  #create and fill table for isfriend... called it friends
  cur.execute("CREATE TABLE friends(\
-                email1        VARCHAR(50) REFERENCES users(email),\
-                email2        VARCHAR(50) REFERENCES users(email),\
+                email1        VARCHAR(50) REFERENCES users(email)\
+                                           ON DELETE CASCADE\
+                                           ON UPDATE CASCADE,\
+                email2        VARCHAR(50) REFERENCES users(email)\
+                                           ON DELETE CASCADE\
+                                           ON UPDATE CASCADE,\
                 PRIMARY KEY(email1, email2))")
  populateFriends(users, cur)
  con.commit()
@@ -489,9 +512,13 @@ try:
                 postID   INT,\
                 date   DATE, \
                 content  TEXT,\
-                last_postID  INT,\
-                poster_email VARCHAR(50) REFERENCES users(email),\
-                assignmentID INT REFERENCES assignments(assignmentID),\
+                last_postID  INT CHECK (last_postID IN (SELECT postID FROM posts)),\
+                poster_email VARCHAR(50) REFERENCES users(email)\
+                                           ON DELETE SET NULL\
+                                           ON UPDATE SET NULL,\
+                assignmentID INT REFERENCES assignments(assignmentID)\
+                                           ON DELETE SET NULL\
+                                           ON UPDATE SET NULL,\
                 PRIMARY KEY(postID, last_postID, poster_email, assignmentID))")
 
  cur.execute("CREATE TABLE files(\
@@ -502,20 +529,26 @@ try:
                 name   VARCHAR(300),\
                 MIME_type  VARCHAR(10),\
                 uploader_email VARCHAR(50),\
-                assignmentID INT REFERENCES assignments(assignmentID),\
+                assignmentID INT REFERENCES assignments(assignmentID)\
+                                           ON DELETE SET NULL\
+                                           ON UPDATE SET NULL,\
                 PRIMARY KEY(fileID, uploader_email, assignmentID))")
 
  cur.execute("CREATE TABLE answers(\
                 answerID INT,\
                 content  TEXT,\
-                assignmentID INT REFERENCES assignments(assignmentID),\
+                assignmentID INT REFERENCES assignments(assignmentID)\
+                                           ON DELETE CASCADE\
+                                           ON UPDATE CASCADE,\
                 prompt  TEXT,\
                 correct  BOOLEAN,\
                 PRIMARY KEY(answerID, assignmentID, prompt))")
 
   #create and fill table for questions
  cur.execute("CREATE TABLE questions(\
-                assignmentID  INT REFERENCES assignments(assignmentID),\
+                assignmentID  INT REFERENCES assignments(assignmentID)\
+                                           ON DELETE CASCADE\
+                                           ON UPDATE CASCADE,\
                 prompt  TEXT,\
                 PRIMARY KEY(assignmentID, prompt))")
 
@@ -526,11 +559,15 @@ try:
 
 
  cur.execute("CREATE TABLE practices(\
-                assignmentID INT PRIMARY KEY REFERENCES assignments(assignmentID),\
+                assignmentID INT PRIMARY KEY REFERENCES assignments(assignmentID)\
+                                           ON DELETE CASCADE\
+                                           ON UPDATE CASCADE,\
                 num_attempts INT)")
 
  cur.execute("CREATE TABLE uploaded(\
-                assignmentID INT PRIMARY KEY REFERENCES assignments(assignmentID),\
+                assignmentID INT PRIMARY KEY REFERENCES assignments(assignmentID)\
+                                           ON DELETE CASCADE\
+                                           ON UPDATE CASCADE,\
                 confirm_time TIME)")
  populatePractices(assignmentIDs, cur)
  populateUploaded(assignmentIDs, cur)
@@ -543,7 +580,9 @@ try:
                 book   VARCHAR(300),\
                 page   VARCHAR(50),\
                 url    TEXT,\
-                uploader_email TEXT REFERENCES users(email),\
+                uploader_email TEXT REFERENCES users(email)\
+                                           ON DELETE SET NULL\
+                                           ON UPDATE SET NULL,\
                 PRIMARY KEY (readingID, uploader_email))")
 
  cur.execute("CREATE TABLE lectures(\
@@ -554,7 +593,9 @@ try:
                 size   INT,\
                 url    TEXT,\
                 MIME_type  VARCHAR(10),\
-                uploader_email VARCHAR(50) REFERENCES users(email),\
+                uploader_email VARCHAR(50) REFERENCES users(email)\
+                                           ON DELETE SET NULL\
+                                           ON UPDATE SET NULL,\
                 PRIMARY KEY (lectureID, uploader_email))")
 
  readingIDs = populateReadings(professors, cur)
@@ -563,20 +604,62 @@ try:
 
  #create tables for lectureFollowsReading and readingForAssignment
  cur.execute("CREATE TABLE lecture_follows_reading(\
-                lectureID  INT,\
-                readingID  INT,\
+                lectureID  INT CHECK (lectureID IN (SELECT lectures.lectureID FROM lectures)),\
+                readingID  INT CHECK (readingID IN (SELECT readings.readingID FROM readings)),\
                 PRIMARY KEY(lectureID, readingID))")
 
  cur.execute("CREATE TABLE reading_for_assignment(\
-                readingID  INT,\
-                assignmentID INT REFERENCES assignments(assignmentID),\
+                readingID  INT CHECK (readingID IN (SELECT readings.readingID FROM readings)),\
+                assignmentID INT REFERENCES assignments(assignmentID)\
+                                           ON DELETE CASCADE\
+                                           ON UPDATE CASCADE,\
                 PRIMARY KEY(readingID, assignmentID))")
 
  populateLectureFollowsReading(readingIDs, lectureIDs, cur)
  populateReadingForAssignment(readingIDs, assignmentIDs, cur)
  con.commit()
 
+ #Triggers
 
+ #Drop old triggers first
+ cur.execute("DROP TRIGGER IF EXISTS AddUserStudent ON students")
+ cur.execute("DROP TRIGGER IF EXISTS AddUserProfessor ON professors")
+ cur.execute("DROP TRIGGER IF EXISTS AddAssignmentPractice ON practices")
+ cur.execute("DROP TRIGGER IF EXISTS AddAssignmentUploaded ON uploaded")
+
+ ###########################
+
+ #create triggers
+ cur.execute("CREATE TRIGGER AddUserStudent\
+                AFTER INSERT ON students\
+                REFERENCING NEW ROW AS newUser\
+                FOR EACH ROW\
+                WHEN (newUser.email NOT IN\
+                  (SELECT email FROM users))\
+                INSERT INTO users(email) VALUES(newUser.email)")
+ cur.execute("CREATE TRIGGER AddUserProfessor\
+                AFTER INSERT ON professors\
+                REFERENCING NEW ROW AS newUser\
+                FOR EACH ROW\
+                WHEN (newUser.email NOT IN\
+                  (SELECT email FROM users))\
+                INSERT INTO users(email) VALUES(newUser.email)")
+
+
+ cur.execute("CREATE TRIGGER AddAssignmentPractice\
+                AFTER INSERT ON practices\
+                REFERENCING NEW ROW AS newAssignment\
+                FOR EACH ROW\
+                WHEN (newAssignment.assignmentID NOT IN\
+                  (SELECT assignmentID FROM assignments))\
+                INSERT INTO assignments(assignmentID) VALUES(newAssignment.assignmentID)")
+ cur.execute("CREATE TRIGGER AddAssignmentUploaded\
+                AFTER INSERT ON uploaded\
+                REFERENCING NEW ROW AS newAssignment\
+                FOR EACH ROW\
+                WHEN (newAssignment.assignmentID NOT IN\
+                  (SELECT assignmentID FROM assignments))\
+                INSERT INTO assignments(assignmentID) VALUES(newAssignment.assignmentID)")
  
 
 except psycopg2.Error, e:
