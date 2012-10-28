@@ -16,8 +16,8 @@ def populateUser(cur):
  professors = []
  schools = ["lafayette","lehigh","stanford","mit","harvard","usb","ucw","bucknell"]
  officeNum = 100
- names1 = ("James", "John", "Robert", "Michael", "William", "David", "Richard", "Charles", "Joseph", "Thomas", "Christopher", "Daniel", "Paul", "Mark", "Donanld", "George", "Kenneth", "Steven", "Edward", "Brian", "Ronald", "Anthony", "Kevin", "Jason", "Matthew", "Gary", "Timothy", "Jose", "Larry", "Jeffrey", "Frank", "Scott", "Eric", "Stehen", "Andrew", "Raymond", "Gregory", "Joshua", "Jerry", "Dennis", "Walter", "Patrick", "Peter", "Mary", "Betty", "Linda", "Barbara", "Jenifer", "Maria", "Susan", "Lisa", "Jackie", "Nancy", "Karen", "Helen", "Sandra", "Donna", "Carol", "Ruth", "Sharon", "Michelle", "Laura")
- names2 = ("Rimal","Johnson", "Williams", "Johnes", "Brown", "Davis", "Miller", "Wilson", "Moore", "Taylor", "Anderson", "Thomas", "Jackson", "White", "Harris", "Martin", "Thompson", "Garcia", "Martinez", "Robinson", "Clark", "Rodriguez", "Gupta", "Li", "Lee", "Walker", "Lewis", "Walken", "Hall")
+ names1 = ("James", "John", "Robert", "Michael", "William", "David", "Richard", "Charles", "Joseph", "Thomas", "Christopher", "Daniel", "Paul", "Mark", "Donanld", "George", "Kenneth", "Steven", "Edward", "Brian", "Ronald", "Anthony", "Kevin", "Jason", "Matthew", "Gary", "Timothy", "Jose", "Larry", "Jeffrey", "Frank", "Scott", "Eric", "Stehen", "Andrew", "Raymond", "Gregory", "Joshua", "Jerry", "Dennis", "Walter", "Patrick", "Peter", "Mary", "Betty", "Linda", "Barbara", "Jenifer", "Maria", "Susan", "Lisa", "Jackie", "Nancy", "Karen", "Helen", "Sandra", "Donna", "Carol", "Ruth", "Sharon", "Michelle", "Laura", "Ben", "Lucas", "Arthur", "Don", "Randall", "Barry", "Alexander", "Jay", "Jim", "Tom", "Derek", "Franklin", "Cody", "Julian", "Russell")
+ names2 = ("Rimal","Johnson", "Williams", "Johnes", "Brown", "Davis", "Miller", "Wilson", "Moore", "Taylor", "Anderson", "Thomas", "Jackson", "White", "Harris", "Martin", "Thompson", "Garcia", "Martinez", "Robinson", "Clark", "Rodriguez", "Gupta", "Li", "Lee", "Walker", "Lewis", "Walken", "Hall", "Smith", "Stevens", "Reagan", "Taft", "Coolridge", "Roosevelt", "Wood", "Hunter", "Knight", "Cunningham", "Bradley", "Lane", "Carrol", "Fields", "Reid", "Roberts", "Forbes", "Kidd", "Levine", "Downs", "Emerson", "Witt", "Holden", "Merrill", "Britt", "Hooper", "Yang", "Sampson", "Petty", "Larkin")
  for first in names1:
    # names2 = names1 #list(set(names2) - first)
    for last in names2:
@@ -92,7 +92,7 @@ def populateSection(cur):#courses are simply the abbreviation for a department p
  rooms = list(range(100,120))
  rooms += list(range(200,220))
  rooms += list(range(300,320))
- for _ in range(200):
+ for _ in range(300):
    classNum_list = list(classNums)
    num = random.choice(classNum_list)
    classNums.remove(num)
@@ -156,7 +156,7 @@ def populateMessages(users, cur): #allow users to send messages to themselves
  stop = time.mktime((2012, 10, 10, 2, 50, 9, 1, 48, 0))
  random_time = random.uniform(int(start), int(stop))
 
- for i in range(200): #total number of messages to create
+ for i in range(500): #total number of messages to create
    cur.execute("INSERT INTO messages VALUES(%s, %s, %s, %s, %s, %s)", [i,
                                             genRandomDate(),
                                             genString(random.randrange(400)),
@@ -172,7 +172,7 @@ def genString(l):
  return r
 #-------------------------------POPULATES 'FRIENDS' TABLE----------------------------------
 def populateFriends(users, cur):
- for _ in range(400): #total number of pairs of friends to create
+ for _ in range(600): #total number of pairs of friends to create
    f = pickFriendPair(users)
    cur.execute("INSERT INTO friends VALUES(%s,%s)",  [f[0],f[1]] )
 
@@ -185,7 +185,7 @@ def pickFriendPair(u):
 #-------------------------------POPULATES 'POSTS' TABLE------------------------------------------
 
 def populatePosts(users, assignmentIDs, cur):
- for id in range(1000):
+ for id in range(3000):
    cur.execute("INSERT INTO posts VALUES(%s,%s,%s,%s,%s,%s)", [id,
                                          genRandomDate(),
                                          genString(random.randint(25, 300)),
@@ -197,7 +197,7 @@ def populatePosts(users, assignmentIDs, cur):
 #--------------------------------POPULATES 'FILES' TABLE--------------------------------------
 
 def populateFiles(users, assignmentIDs, cur):
- for id in range(400):
+ for id in range(600):
    cur.execute("INSERT INTO files VALUES(%s,%s,%s,%s,%s,%s,%s,%s)", [id,
                                          genRandomDate(),
                                          genURL(random.randint(5, 15)),
@@ -211,7 +211,7 @@ def populateFiles(users, assignmentIDs, cur):
 #-------------------------POPULATES 'ANSWERS' AND 'QUESTIONS' TABLE-----------------------------------------
  
 def populateAnswersAndQuestions(assignmentID, cur): 
- for id in range(0, 20000, 4):
+ for id in range(0, 500000, 4):
    correct = [True, False, False, False]
    aID = random.choice(assignmentID)
    qPrompt = genString(random.randint(30,300))
@@ -366,7 +366,7 @@ def populateLectures(professors, cur):
  r = []
  id = 0
  for p in professors:
-   numLectures = random.randrange(15)
+   numLectures = random.randrange(20)
    for _ in range(numLectures):
      cur.execute("INSERT INTO lectures VALUES(%s, %s, %s, %s, %s, %s, %s, %s)", [id,
                                              genString(random.randint(0,200)),
