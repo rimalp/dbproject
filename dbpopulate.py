@@ -389,7 +389,9 @@ con = None
 
 try:
   #CONNECTION TO THE DATABASE
- con = psycopg2.connect(database='tillquir', user='tillquir', password="Rfsrus", host="tomcat.cs.lafayette.edu")
+# con = psycopg2.connect(database='tillquir', user='tillquir', password="Rfsrus", host="tomcat.cs.lafayette.edu")
+ con = psycopg2.connect(database='lafworks', user='prabhat', password="", host="localhost")
+
  cur = con.cursor()
 
  #Drop tables if already created in previous occasions
@@ -400,7 +402,7 @@ try:
 
  #create and fille users, students, and professors
  cur.execute("CREATE TABLE users(\
-                email        VARCHAR(50) PRIMARY KEY,\
+                email        VARCHAR(50),\
                 first_name    VARCHAR(20),\
                 last_name    VARCHAR(20),\
                 password    VARCHAR(300),\
@@ -541,16 +543,17 @@ try:
                                            ON DELETE CASCADE\
                                            ON UPDATE CASCADE,\
                 prompt  TEXT,\
-                correct  BOOLEAN,\
-                PRIMARY KEY(answerID, assignmentID, prompt))")
+                correct  BOOLEAN)")
+                #PRIMARY KEY(answerID, assignmentID, prompt))")
 
   #create and fill table for questions
  cur.execute("CREATE TABLE questions(\
                 assignmentID  INT REFERENCES assignments(assignmentID)\
                                            ON DELETE CASCADE\
                                            ON UPDATE CASCADE,\
-                prompt  TEXT,\
-                PRIMARY KEY(assignmentID, prompt))")
+                prompt  TEXT)")
+
+                #PRIMARY KEY(assignmentID, prompt))")
 
  populatePosts(users, assignmentIDs, cur)
  populateFiles(users, assignmentIDs, cur) #anyone can upload a file
@@ -630,6 +633,8 @@ try:
  ###########################
 
  #create triggers
+
+ #this inserts a user after you insert a new student because a student is a user.
  cur.execute("CREATE TRIGGER AddUserStudent\
                 AFTER INSERT ON students\
                 REFERENCING NEW ROW AS newUser\
@@ -637,6 +642,8 @@ try:
                 WHEN (newUser.email NOT IN\
                   (SELECT email FROM users))\
                 INSERT INTO users(email) VALUES(newUser.email)")
+
+ #this inserts a professor after you insert a new student because a professor is a user.
  cur.execute("CREATE TRIGGER AddUserProfessor\
                 AFTER INSERT ON professors\
                 REFERENCING NEW ROW AS newUser\

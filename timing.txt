@@ -1,0 +1,172 @@
+lafworks=# select count(*) from questions;
+ count  
+--------
+ 125000
+(1 row)
+
+Time: 46.142 ms
+
+Indexing:
+run1: 
+	lafworks=# select count(*) from questions;
+	 count  
+	--------
+	 125000
+	(1 row)
+
+	Time: 22.675 ms
+
+run 2:
+	Time: 25.558 ms
+	lafworks=# select count(*) from questions;
+	 count  
+	--------
+	 125000
+	(1 row)
+
+	Time: 23.171 ms
+
+
+
+=======================================
+
+
+lafworks=# select count(*) from answers;
+ count  
+--------
+ 500000
+(1 row)
+
+Time: 130.329 
+Indexing:
+run 1:
+	 count  
+	--------
+	 500000
+	(1 row)
+
+	Time: 128.805 ms
+
+run 2:
+	 count  
+	--------
+	 500000
+	(1 row)
+
+	Time: 120.219 ms
+
+
+=======================================
+
+lafworks=# select * from answers;
+Time: 826.895 ms
+
+indexing: 
+
+	run 1:  Time: 707.509 ms
+
+	run 2:  Time: 715.849 ms
+
+	run 3: Time: 713.964 ms
+
+
+=======================================
+
+
+lafworks=# select count(answerid) from answers where correct=true;
+ count  
+--------
+ 125000
+(1 row)
+
+Time: 153.104 ms
+
+no significant chage. 
+
+
+=======================================
+
+
+
+
+
+lafworks=# select count(assignmentid) from questions group by assignmentid;
+ count 
+-------
+     6
+    15
+     7
+    13
+    14
+     7
+    11
+    10
+     8
+    13
+    12
+     9
+     7
+     9
+     9
+    10
+     7
+    16
+    12
+     7
+    14
+    10
+     8
+     5
+    12
+    10
+     9
+Time: 162.247 ms
+
+
+after indexing:
+
+	run 1: Time: 64.938 ms
+
+	run 2: Time: 66.035 ms
+
+	run 3: Time: 60.402 ms
+=======================================
+
+
+Time: 828.451 ms
+lafworks=# select questions.prompt, content from questions, answers where answers.prompt=questions.prompt and correct=true;
+
+after indexing:
+
+run 1:
+
+	Time: 801.426 ms
+	lafworks=# select questions.prompt, content from questions, answers where answers.prompt=questions.prompt and correct=true;
+
+run 2: 
+	Time: 797.555 ms
+	lafworks=# select questions.prompt, content from questions, answers where answers.prompt=questions.prompt and correct=true;
+
+after adding answer_content index:
+
+
+
+=======================  INDEXING ===========================
+lafworks=# create index question_index on questions(prompt);
+CREATE INDEX
+Time: 8814.226 ms
+
+
+CREATE INDEX answerid_index on answers(answerid);
+CREATE INDEX
+Time: 693.827 ms
+
+CREATE INDEX user_email_index ON users(email);
+CREATE INDEX
+Time: 172.983 ms
+
+create index answer_content on answers(content);
+CREATE INDEX
+Time: 37953.996 ms
+
+=============================================================
