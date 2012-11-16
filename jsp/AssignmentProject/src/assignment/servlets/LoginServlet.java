@@ -18,10 +18,10 @@ import assignment.db.*;
  */
 public class LoginServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-     
+
 	private DatabaseManager manager;
 	private static Statement sql;
-	
+
 	/**
 	 * @see Servlet#init(ServletConfig)
 	 */
@@ -31,16 +31,26 @@ public class LoginServlet extends HttpServlet {
 			manager = new DatabaseManager();
 			sql = DatabaseManager.getSql();
 		}catch(ClassNotFoundException e){
-			
+
 		}catch(SQLException sqle){
-			
+
 		}
-	
+
 		System.out.println("Inside the init method, the value of sql Statement object: " + sql);
 
 	}
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		String pressed = request.getParameter("id");
+		System.out.println("LOGGING OUT: "+pressed);
+		if(pressed != null)
+		{
+			request.getSession().removeAttribute("currentEmail");
+			request.getSession().removeAttribute("name");
+			//more?
+			System.out.println("DIRECTING TO INDEX");
+			response.sendRedirect("index.jsp");
+		}
 		
 	}
 
@@ -50,25 +60,28 @@ public class LoginServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
 		System.out.println("The SQL object: " + sql);
-		
+
 		response.setContentType("text/html");
 		PrintWriter out = response.getWriter();		
-		
+
 		HttpSession session = request.getSession();
-		
-		
+
 		if(request.getParameter("login") != null){
-			
+
 			String username = request.getParameter("username");
 			String password = request.getParameter("password");
-			
+
 			if(this.validateUser(username, password)){
 				//save the user to the session eobject
-				session.setAttribute("currentEmail", username);		
-				
+				session.setAttribute("currentEmail", username);
+
+				String name = getUserName(username);
+				session.setAttribute("name", name);
+				System.out.println("NAME: "+name);
+
 				System.out.println("The button pressed: " + request.getParameter("login"));
 
-				
+
 				if(isProfessor(username)){
 					response.sendRedirect("professor_welcome.jsp");
 					System.out.println("The button pressed for professor login: " + request.getParameter("login"));
@@ -78,14 +91,84 @@ public class LoginServlet extends HttpServlet {
 
 					response.sendRedirect("student_welcome.jsp");
 				}
-				
+
 			}else {//wrong user-name/password
-					response.sendRedirect("error.jsp");
+				response.sendRedirect("error.jsp");
 			}
-			
-		}else{
+
+		}
+		//Begin test portion//
+		else if(request.getParameter("show") != null)
+		{
+			ResultSet rs = queryDB("SELECT * FROM users LIMIT 5");
+			try{
+				while(rs.next())
+				{
+					out.print("<p>"+rs.getString("email")+" *** "+rs.getString("password"));
+
+				}
+			}catch (SQLException e){ System.out.println("SQL Exception: "+e); }
+		}
+		else if(request.getParameter("change") != null)
+		{
+			ResultSet rs = queryDB(String.format("SELECT * FROM users WHERE email='%s'",request.getParameter("email")));
+			try{
+				while(rs.next())
+				{
+					out.print("<p>"+rs.getString("email")+" *** "+rs.getString("password"));
+
+				}
+			}catch (SQLException e){ System.out.println("SQL Exception: "+e); }
+			//update db
+			try{
+				sql.executeUpdate(String.format("UPDATE users SET password='%s' WHERE email='%s'",request.getParameter("newPass"),request.getParameter("email")));
+				System.out.println("NEW EMAIL: "+request.getParameter("newEmail"));
+				//below not working... why???
+				sql.executeUpdate(String.format("UPDATE users SET email='%s' WHERE email='%s'",request.getParameter("newEmail"),request.getParameter("newEmail")));
+				rs = queryDB(String.format("SELECT * FROM users WHERE email='%s'",request.getParameter("newEmail")));
+				while(rs.next())
+				{
+					out.print("<p>"+rs.getString("email")+" *** "+rs.getString("password"));
+
+				}
+			}catch(SQLException e){ System.out.println("SQLException on update: "+e); }
+		}
+		//End test portion//
+		else{
 			response.sendRedirect("index.jsp");
 		}
+	}
+
+	private String getUserName(String email)
+	{
+		String r="";
+		ResultSet rs = queryDB(String.format("SELECT first_name, last_name FROM users WHERE email='%s'",email));
+		try{
+			while(rs.next())
+			{
+				r+=rs.getString("first_name")+" "+rs.getString("last_name");
+			}
+		}catch(SQLException e){ System.out.println("SQLException on update: "+e); }
+		return r;
+	}
+
+	//FOR TESTING
+	private ResultSet queryDB(String query)
+	{
+		ResultSet rs = null;
+		try {		
+			if(sql == null) {
+				System.out.println("SQL STATEMENT OBJECT IS EMPTY!");
+			} else {
+				if(sql.isClosed()) {
+					System.err.println("The sql statement object is closed!!!");					
+				}
+				rs = sql.executeQuery(query);
+			}
+		} catch(SQLException e){
+			System.err.println("Exception generated ----> " + e.toString());
+		}
+		return rs;
 	}
 
 
@@ -93,11 +176,11 @@ public class LoginServlet extends HttpServlet {
 		String query = String.format("SELECT email, password FROM users WHERE email='%s' AND password='%s'",username, password);
 
 		ResultSet rs = null;
-			
+
 		System.out.println("inside the validateUser() method, rs value initially "  + rs);
-		
+
 		try {
-						
+
 			if(sql == null) {
 				System.out.println("SQL STATEMENT OBJECT IS EMPTY!");
 			} else {
@@ -113,14 +196,14 @@ public class LoginServlet extends HttpServlet {
 				//save the user to the session object
 			}
 		} catch(SQLException e){
-			
+
 			System.err.println("Exception generated ----> " + e.toString());
 		}
 		return false;
 	}
-	
+
 	private boolean isProfessor(String email){
-		
+
 		String query = String.format("SELECT email FROM professors WHERE email='%s'", email);
 
 		ResultSet rs = null;

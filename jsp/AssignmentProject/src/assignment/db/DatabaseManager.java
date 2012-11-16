@@ -15,8 +15,8 @@ public class DatabaseManager {
 	private static DatabaseMetaData dbmd;
 
 	private static final String database = "//localhost:5432/lafworks";
-	private static final String username = "prabhat";
-	private static final String password = "";
+	private static final String username = "postgres";
+	private static final String password = "abc";
 
 
 	public DatabaseManager() throws ClassNotFoundException, SQLException{
@@ -31,9 +31,11 @@ public class DatabaseManager {
 		//perform a lazy instantiation of the connection
 		if(DatabaseManager.sql != null) return con.createStatement();
 		else{
+	
+			System.out.println("Connecting???????????????????");
 			Class.forName("org.postgresql.Driver"); //driver for the database manager
 			con = DriverManager.getConnection("jdbc:postgresql:"+database, username, password); //connection to the database
-
+			System.out.println("con set");
 			dbmd = con.getMetaData();
 
 			System.out.println("Connection to "+ dbmd.getDatabaseProductName() + "  " + 

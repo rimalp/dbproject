@@ -8,7 +8,15 @@
 </head>
 <body>
 
-wrong usrname/password!!
+wrong usrname/password!! Try again: <br/>
+<form method="post" action="loginpath">
+  Username: <input type="text" name="username" size="15" /><br />
+  Password: <input type="password" name="password" size="15" /><br />
+  <div align="left">
+    <input type="submit" name = "login" value="Login" />
+    <input type="submit" name = "cancel" value="Cancel" /> 
+  </div>
+</form>
 
 </body>
 </html>

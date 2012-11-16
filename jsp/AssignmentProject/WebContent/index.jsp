@@ -20,5 +20,23 @@
     <input type="submit" name = "cancel" value="Cancel" /> 
   </div>
 </form>
+
+<!-- begin test portion -->
+<br/>
+<br/>
+<form method="post" action="loginpath">
+  <input type="submit" name="show" value="Show First 5 Users" />
+</form>
+<br/>
+<br/>
+<form method="post" action="loginpath">
+  Email: <input type="text" name="email" size="15" /><br/>
+  New Email: <input type="text" name="newEmail" size="15" /><br/>
+  New Password: <input type="text" name="newPass" /><br/>
+  <input type="submit" name = "change" value="Update Password" />
+</form>
+
+<!-- end test portion -->
+
 </body>
 </html>

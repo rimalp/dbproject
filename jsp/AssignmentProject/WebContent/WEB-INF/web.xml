@@ -49,4 +49,14 @@
     <servlet-name>deletethis</servlet-name>
     <url-pattern>/deletethis</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>Account_Settings_Servlet</display-name>
+    <servlet-name>Account_Settings_Servlet</servlet-name>
+    <servlet-class>assignment.servlets.Account_Settings_Servlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>Account_Settings_Servlet</servlet-name>
+    <url-pattern>/Account_Settings_Servlet</url-pattern>
+  </servlet-mapping>
 </web-app>
