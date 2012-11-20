@@ -83,13 +83,72 @@ public class LoginServlet extends HttpServlet {
 
 
 				if(isProfessor(username)){
+					//get everything to be displayed on prof welcome page
+					//and set variables to be used etc... do same for student portion
+					//http://stackoverflow.com/questions/3608891/pass-variables-from-servlet-to-jsp\
+					
 					response.sendRedirect("professor_welcome.jsp");
 					System.out.println("The button pressed for professor login: " + request.getParameter("login"));
 
 				}else {
-					System.out.println("The button pressed for student login: " + request.getParameter("login"));
+					/*
+					 * NOTES:
+					 * not sure if addWOCount works because not sure if there are any classes
+					 * without any active assignments... might have to refill database to test this
+					 * ...
+					 */
+					
+					
+					//System.out.println("0000000000000000000000000000000000");
+					//result set of (course, assignmentCount) tuples for course with assignments that this student takes
+					//only get active assignments... deadline > currentDate
+					//ERROR: deadline is a varchar (why???) convert to date then compare with current_date
+					//http://www.postgresql.org/docs/8.1/static/functions-formatting.html
+					/*ResultSet t = queryDB("SELECT deadline FROM assignments WHERE assignmentID < 10");
+					try{
+						while(t.next())
+						{
+							System.out.println(t.getString("deadline"));
 
-					response.sendRedirect("student_welcome.jsp");
+						}
+					}catch (SQLException e){ System.out.println("SQL Exception: "+e); }
+					*/
+					
+					
+					String countQuery = "SELECT course, COUNT(DISTINCT assignmentID) FROM sections, takes, assignments WHERE sections.CRN=takes.CRN AND assignments.CRN=takes.CRN AND takes.email='"+username+"' AND to_date(deadline, 'YYYY-MM-DD') > CURRENT_DATE GROUP BY course";
+					ResultSet assignmentCount = queryDB(countQuery);
+					String[][] data = addWithCounts(assignmentCount);
+					
+					//System.out.println("1111111111111111111111111111");
+					//result set of all courses that this student takes with 0 active assignments...
+					//all courses that this student takes minus those with active assignments
+					String allCourses = "SELECT course FROM sections, takes WHERE takes.CRN=sections.CRN AND takes.email='"+username+"'";
+					String withActive = "SELECT course FROM sections, takes, assignments WHERE sections.CRN=takes.CRN AND assignments.CRN=takes.CRN AND takes.email='"+username+"' AND to_date(deadline, 'YYYY-MM-DD') > CURRENT_DATE";
+					ResultSet rest = queryDB("("+allCourses+") EXCEPT ("+withActive+")");
+					data = addWOCounts(data, rest);
+					
+					//test print data... any classes with no assignments?
+					/*for(int i=0; i<data.length; i++)
+					{
+						for(int j=0; j<data[i].length; j++)
+						{
+							System.out.print(data[i][j]+": ");
+						}
+						System.out.println();
+					}*/
+					//System.out.println("222222222222222222222222222222");
+					//assumes no student takes more than 10 sections...
+					//could add in checks to grow array if needed or use arraylist
+					//String[][] data = studentWelcomeArray(assignmentCount, rest);
+					//System.out.println("3333333333333333333333333333333333333333");
+					
+					request.setAttribute("data", data);
+				    request.getRequestDispatcher("student_welcome.jsp").forward(request, response);
+				    
+					//System.out.println("The button pressed for student login: " + request.getParameter("login"));
+
+					//response.sendRedirect("student_welcome.jsp");
+					//response.sendRedirect("student_welcome_path");
 				}
 
 			}else {//wrong user-name/password
@@ -109,7 +168,7 @@ public class LoginServlet extends HttpServlet {
 				}
 			}catch (SQLException e){ System.out.println("SQL Exception: "+e); }
 		}
-		else if(request.getParameter("change") != null)
+		/*else if(request.getParameter("change") != null)
 		{
 			ResultSet rs = queryDB(String.format("SELECT * FROM users WHERE email='%s'",request.getParameter("email")));
 			try{
@@ -132,13 +191,56 @@ public class LoginServlet extends HttpServlet {
 
 				}
 			}catch(SQLException e){ System.out.println("SQLException on update: "+e); }
-		}
+		}*/
 		//End test portion//
 		else{
 			response.sendRedirect("index.jsp");
 		}
 	}
-
+	
+	/*
+	 * takes the result set of courses without active assignments and adds to data array
+	 */
+	private String[][] addWOCounts(String[][] d, ResultSet a)
+	{	
+		try{
+			int i=0;
+			//get correct i
+			while(d[i][0] != null){ i++; }
+			while(a.next())
+			{
+				System.out.println("Count=0: "+a.getString(1));
+				d[i][0]=a.getString(1);
+				d[i][1]="0";
+				i++;
+			}
+		}catch(SQLException e) { System.out.println("SQLEXCEPTION: "+e); }
+		
+		return d;
+	}
+	
+	/*
+	 * takes the result set of courses with active assignment count and converts it
+	 * to a 2d array...
+	 */
+	private String[][] addWithCounts(ResultSet count)
+	{
+		String[][] r=new String[10][2];
+		
+		try{
+			int i=0;
+			while(count.next())
+			{
+				//System.out.println("HERGERGEG: "+count.getString(1));
+				r[i][0]=count.getString(1);
+				r[i][1]=Integer.toString(count.getInt(2));
+				i++;
+			}
+		}catch(SQLException e) { System.out.println("SQLEXCEPTION: "+e); }
+		
+		return r;
+	}
+	
 	private String getUserName(String email)
 	{
 		String r="";

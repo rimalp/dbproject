@@ -79,72 +79,33 @@ Active Assignments
 </td>
 </tr>
 </table>
+
+<!-- get info to populate page here (???) 
+http://www.coderanch.com/t/534514/JSP/java/populating-table-database-values
+
+
+http://stackoverflow.com/questions/13410284/displaying-mysql-query-results-from-servlet-to-jsp
+http://www.java-forums.org/java-servlet/12717-how-call-method-servet-using-jsp.html
+http://stackoverflow.com/questions/2354293/calling-a-java-method-in-jsp
+-->
+<% String[][] data=(String[][])request.getAttribute("data");
+//out.println("<h1>"+data[0][0]+"</h1>");%>
+
 <table border="0" cellpadding="0" cellspacing="9" width="100%" class="normalfont">
+<% for(int i=0; i<data.length; i++){ 
+if(data[i][0] != null){%>
 <tr class="normalfont">
 <td>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<a href="">
-Section 1
-</a>
+<% out.print("<a href=\"student_section_servlet_path\">"+data[i][0]+"</a>");%>
 </td>
 <td align="right">
-2
+<% out.print(data[i][1]); %>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 </td>
 </tr>
-
-<tr class="normalfont">
-<td>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<a href="">
-Section 2
-</a>
-</td>
-<td align="right">
-5
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</td>
-</tr>
-
-<tr class="normalfont">
-<td>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<a href="">
-Section 3
-</a>
-</td>
-<td align="right">
-3
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</td>
-</tr>
-
-<tr class="normalfont">
-<td>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<a href="">
-Section 4
-</a>
-</td>
-<td align="right">
-1
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</td>
-</tr>
-
-<tr class="normalfont">
-<td>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<a href="">
-Section 5
-</a>
-</td>
-<td align="right">
-0
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</td>
-</tr>
-
+<% }
+} %>
 </table>
 <br />
 

@@ -37,7 +37,7 @@ out.println(e); %>
 <tr style="height: 35px;">
 <td>
 &nbsp;&nbsp;&nbsp;&nbsp;&#8226;&nbsp;
-<a href="" style="color: darkblue;">
+<a href="student_welcome.jsp" style="color: darkblue;">
 Home Page
 </a>
 </td>

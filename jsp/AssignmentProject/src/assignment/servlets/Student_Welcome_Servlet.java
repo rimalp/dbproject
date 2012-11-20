@@ -34,6 +34,7 @@ public class Student_Welcome_Servlet extends HttpServlet {
 		}catch(ClassNotFoundException e){}
 		catch(SQLException sqle){}
 	
+		System.out.println("STUDENTWELCOME INIT");
 		System.out.println("Inside the init method, the value of sql Statement object: " + sql);
 
 	}

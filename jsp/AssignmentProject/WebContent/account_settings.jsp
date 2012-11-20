@@ -22,100 +22,13 @@ a {text-decoration: none;}
 <table border="0" cellpadding="0" cellspacing="0" width="875px" style="height: 100%">
 <tr valign="top">
 <td style="width: 190px;" class="marginbackground">
-<table border="0" cellpadding="0" cellspacing="0" width="100%" class="normalfont" style="height: 100%" >
-<tr style="height: 61px; border-bottom-width: 0px; " valign="top">
-<td>
 
-</td>
-</tr>
-<tr style="height: 10px;">
-<td>
-&nbsp;
-</td>
-</tr>
 
-<tr class="darkbackgroundwithnormalfont" style="height: 20px;">
-<td align="center">
-<b>
-<% String e = (String)request.getSession().getAttribute("name");
-out.println(e); %>
-</b>
-</td>
-</tr>
-<tr style="height: 10px;">
-<td>
-&nbsp;
-</td>
-</tr>
 
-<tr style="height: 35px;">
-<td>
-&nbsp;&nbsp;&nbsp;&nbsp;&#8226;&nbsp;
-<a href="" style="color: darkblue;">
-Home Page
-</a>
-</td>
-</tr>
+<%@ include file="student_left_links.jsp" %>
 
-<tr style="height: 35px;">
-<td>
-&nbsp;&nbsp;&nbsp;&nbsp;&#8226;&nbsp;
-<a href="" style="color: darkblue;">
-Sections
-</a>
-</td>
-</tr>
 
-<tr style="height: 35px;">
-<td>
-&nbsp;&nbsp;&nbsp;&nbsp;&#8226;&nbsp;
-<a href="" style="color: darkblue;">
-Assignments
-</a>
-</td>
-</tr>
 
-<tr style="height: 35px;">
-<td>
-&nbsp;&nbsp;&nbsp;&nbsp;&#8226;&nbsp;
-<a href="" style="color: darkblue;">
-Account Settings
-</a>
-</td>
-</tr>
-
-<tr style="height: 35px;">
-<td>
-&nbsp;&nbsp;&nbsp;&nbsp;&#8226;&nbsp;
-<a href="" style="color: darkblue;">
-Log Out
-</a>
-</td>
-</tr>
-
-<!-- more links here? -->
-
-<tr style="height: 10px;">
-<td>
-&nbsp;
-</td>
-</tr>
-<tr>
-<td>
-&nbsp;
-</td>
-</tr>
-
-<tr style="height: 35px;">
-<td>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<a href="" style="color: darkblue;">
-Help
-</a>
-</td>
-</tr>
-
-</table>
 </td>
 <td style="width: 3px; background-color: black;">&nbsp;</td>
 <td valign="top" class="lightbackgroundwithnormalfont" style="width: 686px;">

@@ -59,4 +59,14 @@
     <servlet-name>Account_Settings_Servlet</servlet-name>
     <url-pattern>/Account_Settings_Servlet</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>Student_Section_Servlet</display-name>
+    <servlet-name>Student_Section_Servlet</servlet-name>
+    <servlet-class>assignment.servlets.Student_Section_Servlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>Student_Section_Servlet</servlet-name>
+    <url-pattern>/Student_Section_Servlet</url-pattern>
+  </servlet-mapping>
 </web-app>
