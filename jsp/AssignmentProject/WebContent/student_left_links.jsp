@@ -37,7 +37,7 @@ out.println(e); %>
 <tr style="height: 35px;">
 <td>
 &nbsp;&nbsp;&nbsp;&nbsp;&#8226;&nbsp;
-<a href="student_welcome.jsp" style="color: darkblue;">
+<a href="loginpath?id=student_home_link" style="color: darkblue;">
 Home Page
 </a>
 </td>
@@ -46,7 +46,7 @@ Home Page
 <tr style="height: 35px;">
 <td>
 &nbsp;&nbsp;&nbsp;&nbsp;&#8226;&nbsp;
-<a href="" style="color: darkblue;">
+<a href="student_welcome_path?id=sections" style="color: darkblue;">
 Sections
 </a>
 </td>
@@ -55,7 +55,7 @@ Sections
 <tr style="height: 35px;">
 <td>
 &nbsp;&nbsp;&nbsp;&nbsp;&#8226;&nbsp;
-<a href="" style="color: darkblue;">
+<a href="student_welcome_path?id=assignments" style="color: darkblue;">
 Assignments
 </a>
 </td>

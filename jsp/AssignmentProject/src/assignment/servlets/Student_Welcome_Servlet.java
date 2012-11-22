@@ -51,38 +51,121 @@ public class Student_Welcome_Servlet extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		//find out what button/link was pressed and do the processing in separate methods in this class.
-		String pressed = request.getParameter("action");//make each button with name="action"
+		System.out.println("student welcome do get ##################################");
 		
-		//userEmail is the current users email
 		HttpSession session = request.getSession();
-		String userEmail = (String) session.getAttribute("currentEmail");
+		String email = (String) session.getAttribute("currentEmail");
+		
+		String pressed = request.getParameter("id");
 		
 		ResultSet rs = null;
 		String query = "";
 		
-		//if sections is pressed
 		if(pressed.equals("sections"))
 		{
+			System.out.println("SECTIONS PRESSED");
+			
+			
+			String[][] sectionData= null;
+			
 			//find the CRNs and course names for the sections that the student is in
-			query = String.format("SELECT CRN, course FROM takes, sections WHERE email='%s' AND sections.CRN=takes.CRN", userEmail);			
+			//sections page displays section names, num active assignments, and next deadline
+			//query = String.format("SELECT CRN, course FROM takes, sections WHERE email='%s' AND sections.CRN=takes.CRN", email);
+			//just gets course name, active assignment count, next due date, CRN for links
+			String active = "SELECT course, COUNT(DISTINCT assignmentID), MIN(to_date(deadline, 'YYYY-MM-DD'))::TEXT, takes.CRN FROM sections, takes, assignments WHERE sections.CRN=takes.CRN AND takes.CRN=assignments.CRN AND takes.email='"+email+"' AND to_date(deadline, 'YYYY-MM-DD') > CURRENT_DATE GROUP BY course, takes.CRN ORDER BY course";
+			rs = queryDB(active);
+			//add rs to sectionData[][]
+			sectionData = fillSectionDataA(rs);
+			
+			//HERE!!!!!!!!!!!!! GET NEXT DUE DATE FOR EACH SECTION
+			//get next deadline for each section that the student is in
+			//String next = "SELECT course, deadline FROM sections, assignments, takes WHERE takes.email='"+email+"' AND sections.CRN=takes.CRN AND takes.CRN=assignments.CRN AND (to_date(deadline, 'YYYY-MM-DD') - CURRENT_DATE) > 0 AND (to_date(deadline, 'YYYY-MM-DD') - CURRENT_DATE) <= ALL(SELECT (to_date(deadline, 'YYYY-MM-DD') - CURRENT_DATE) FROM assignments, takes WHERE takes.email='"+email+"' AND takes.CRN=assignments.CRN) ORDER BY course";
+			//rs = queryDB(next);//HEREREHEHEHEHERHERHERHERHERee
+			//add new rs to sectionData[][]
+			//sectionData = fillSectionDataB(sectionData, rs);
+			
+			//String[][] sectionData = fillSectionData(rs);
+			//System.out.println("11111111111111111111111111111111111");
+			try{
+				request.setAttribute("sectionData", sectionData);
+				request.getRequestDispatcher("student_sections.jsp").forward(request, response);
+			}catch(IOException e) { System.out.println("ioexception: "+e); }
+			catch (ServletException e) { System.out.println("servlet exception: "+e); }
 		}
-		//if assignments is pressed
 		else if(pressed.equals("assignments"))
 		{
-			//find the assignment name, deadline, description (anything else?) that this student has
-			//order by deadline???
-			query = String.format("SELECT name, deadline, description FROM assignments, takes WHERE takes.email='%s' AND takes.CRN=assignments.CRN ORDER BY deadline ASC", userEmail);
+			System.out.println("Assignments PRESSED");
+			//section, description, type, deadline
+			//not sure we have a type column in the database
+			query = String.format("SELECT name, description, to_date(deadline, 'YYYY-MM-DD') FROM assignments, takes WHERE takes.email='%s' AND takes.CRN=assignments.CRN AND to_date(deadline, 'YYYY-MM-DD') >= CURRENT_DATE ORDER BY deadline ASC", email);
+			rs = queryDB(query);
+			
+			String[][] currentAssignmentData= fillAssignmentData(rs);
+			
+			query="SELECT name, description, to_date(deadline, 'YYYY-MM-DD')::TEXT FROM assignments, takes WHERE takes.email='"+email+"' AND takes.CRN=assignments.CRN AND to_date(deadline, 'YYYY-MM-DD') < CURRENT_DATE ORDER BY deadline ASC";
+			rs= queryDB(query);
+			
+			String[][] oldAssignmentData=fillAssignmentData(rs);
+			try{
+				request.setAttribute("currentData", currentAssignmentData);
+				request.setAttribute("oldData", oldAssignmentData);
+				request.getRequestDispatcher("student_assignment.jsp").forward(request, response);
+			}catch(IOException e) { System.out.println("ioexception: "+e); }
+			catch (ServletException e) { System.out.println("servlet exception: "+e); }
 		}
-		//more cases???
+		else
+		{
+			
+		}
 		
 		
-		rs = queryDB(query);
-		//now send the resultset rs to the next page so it can be populated correctly
-		//HOW DO WE DO THIS??? ... servlet chaining? or something else???
-
+		
 	}
 
+	
+	/*
+	 * fills section data array with data from rs (result of query)
+	 */
+	private String[][] fillSectionDataA(ResultSet rs)
+	{
+		String[][] r=new String[10][4];
+		
+		try{
+			int i=0;
+			while(rs.next())
+			{
+				//System.out.println("HERGERGEG: "+count.getString(1));
+				r[i][0]=rs.getString(1);
+				r[i][1]=Integer.toString(rs.getInt(2));
+				r[i][2]=rs.getString(3);
+				r[i][3]=rs.getString(4);
+				i++;
+			}
+		}catch(SQLException e) { System.out.println("SQLEXCEPTION: "+e); }
+		
+		return r;
+	}
+	
+	/*
+	 * fills assignment data array with data from result set
+	 */
+	private String[][] fillAssignmentData(ResultSet rs)
+	{
+		String[][] r = new String[100][4];
+		try{
+			int i=0;
+			while(rs.next())
+			{
+				//System.out.println("HERGERGEG: "+rs.getString(1));
+				r[i][0]=rs.getString(1);
+				r[i][1]=rs.getString(2);
+				r[i][2]=rs.getString(3);
+				//r[i][3]=rs.getString(4);
+				i++;
+			}
+		}catch(SQLException e) { System.out.println("SQLEXCEPTION: "+e); }
+		return r;
+	}
 	
 	/**
 	 * queries the database with the given string interpreted as an sql statement...

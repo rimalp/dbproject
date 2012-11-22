@@ -42,8 +42,8 @@ public class LoginServlet extends HttpServlet {
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String pressed = request.getParameter("id");
-		System.out.println("LOGGING OUT: "+pressed);
-		if(pressed != null)
+		System.out.println("DOGET login servlet: "+pressed);
+		if(pressed.equals("logout_link"))
 		{
 			request.getSession().removeAttribute("currentEmail");
 			request.getSession().removeAttribute("name");
@@ -51,9 +51,58 @@ public class LoginServlet extends HttpServlet {
 			System.out.println("DIRECTING TO INDEX");
 			response.sendRedirect("index.jsp");
 		}
+		else if(pressed.equals("student_home_link"))
+		{
+			//CODE TO DISPLAY HOME PAGE
+			displayStudentHome((String)request.getSession().getAttribute("currentEmail"), request, response);
+		}
 		
 	}
 
+	/*
+	 * method to display the homepage of a student
+	 */
+	private void displayStudentHome(String username, HttpServletRequest request, HttpServletResponse response)
+	{
+		String countQuery = "SELECT course, COUNT(DISTINCT assignmentID), sections.CRN FROM sections, takes, assignments WHERE sections.CRN=takes.CRN AND assignments.CRN=takes.CRN AND takes.email='"+username+"' AND to_date(deadline, 'YYYY-MM-DD') > CURRENT_DATE GROUP BY course, sections.CRN";
+		ResultSet assignmentCount = queryDB(countQuery);
+		String[][] data = addWithCounts(assignmentCount);
+		
+		//System.out.println("1111111111111111111111111111");
+		//result set of all courses that this student takes with 0 active assignments...
+		//all courses that this student takes minus those with active assignments
+		String allCourses = "SELECT course FROM sections, takes WHERE takes.CRN=sections.CRN AND takes.email='"+username+"'";
+		String withActive = "SELECT course FROM sections, takes, assignments WHERE sections.CRN=takes.CRN AND assignments.CRN=takes.CRN AND takes.email='"+username+"' AND to_date(deadline, 'YYYY-MM-DD') > CURRENT_DATE";
+		ResultSet rest = queryDB("("+allCourses+") EXCEPT ("+withActive+")");
+		data = addWOCounts(data, rest);
+		
+		//test print data... any classes with no assignments?
+		/*for(int i=0; i<data.length; i++)
+		{
+			for(int j=0; j<data[i].length; j++)
+			{
+				System.out.print(data[i][j]+": ");
+			}
+			System.out.println();
+		}*/
+		//System.out.println("222222222222222222222222222222");
+		//assumes no student takes more than 10 sections...
+		//could add in checks to grow array if needed or use arraylist
+		//String[][] data = studentWelcomeArray(assignmentCount, rest);
+		//System.out.println("3333333333333333333333333333333333333333");
+		
+		try{
+			request.setAttribute("data", data);
+			request.getRequestDispatcher("student_welcome.jsp").forward(request, response);
+		}catch(IOException e) { System.out.println("ioexception: "+e); }
+		catch (ServletException e) { System.out.println("servlet exception: "+e); }
+		
+		//System.out.println("The button pressed for student login: " + request.getParameter("login"));
+
+		//response.sendRedirect("student_welcome.jsp");
+		//response.sendRedirect("student_welcome_path");
+	}
+	
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -115,40 +164,7 @@ public class LoginServlet extends HttpServlet {
 					*/
 					
 					
-					String countQuery = "SELECT course, COUNT(DISTINCT assignmentID) FROM sections, takes, assignments WHERE sections.CRN=takes.CRN AND assignments.CRN=takes.CRN AND takes.email='"+username+"' AND to_date(deadline, 'YYYY-MM-DD') > CURRENT_DATE GROUP BY course";
-					ResultSet assignmentCount = queryDB(countQuery);
-					String[][] data = addWithCounts(assignmentCount);
-					
-					//System.out.println("1111111111111111111111111111");
-					//result set of all courses that this student takes with 0 active assignments...
-					//all courses that this student takes minus those with active assignments
-					String allCourses = "SELECT course FROM sections, takes WHERE takes.CRN=sections.CRN AND takes.email='"+username+"'";
-					String withActive = "SELECT course FROM sections, takes, assignments WHERE sections.CRN=takes.CRN AND assignments.CRN=takes.CRN AND takes.email='"+username+"' AND to_date(deadline, 'YYYY-MM-DD') > CURRENT_DATE";
-					ResultSet rest = queryDB("("+allCourses+") EXCEPT ("+withActive+")");
-					data = addWOCounts(data, rest);
-					
-					//test print data... any classes with no assignments?
-					/*for(int i=0; i<data.length; i++)
-					{
-						for(int j=0; j<data[i].length; j++)
-						{
-							System.out.print(data[i][j]+": ");
-						}
-						System.out.println();
-					}*/
-					//System.out.println("222222222222222222222222222222");
-					//assumes no student takes more than 10 sections...
-					//could add in checks to grow array if needed or use arraylist
-					//String[][] data = studentWelcomeArray(assignmentCount, rest);
-					//System.out.println("3333333333333333333333333333333333333333");
-					
-					request.setAttribute("data", data);
-				    request.getRequestDispatcher("student_welcome.jsp").forward(request, response);
-				    
-					//System.out.println("The button pressed for student login: " + request.getParameter("login"));
-
-					//response.sendRedirect("student_welcome.jsp");
-					//response.sendRedirect("student_welcome_path");
+					displayStudentHome(username, request, response);
 				}
 
 			}else {//wrong user-name/password
@@ -225,7 +241,7 @@ public class LoginServlet extends HttpServlet {
 	 */
 	private String[][] addWithCounts(ResultSet count)
 	{
-		String[][] r=new String[10][2];
+		String[][] r=new String[10][3];
 		
 		try{
 			int i=0;
@@ -234,6 +250,7 @@ public class LoginServlet extends HttpServlet {
 				//System.out.println("HERGERGEG: "+count.getString(1));
 				r[i][0]=count.getString(1);
 				r[i][1]=Integer.toString(count.getInt(2));
+				r[i][2]=count.getString(3);
 				i++;
 			}
 		}catch(SQLException e) { System.out.println("SQLEXCEPTION: "+e); }

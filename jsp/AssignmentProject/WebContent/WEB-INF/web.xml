@@ -67,6 +67,16 @@
   </servlet>
   <servlet-mapping>
     <servlet-name>Student_Section_Servlet</servlet-name>
-    <url-pattern>/Student_Section_Servlet</url-pattern>
+    <url-pattern>/student_section_servlet_path</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>Student_Assignment_Servlet</display-name>
+    <servlet-name>Student_Assignment_Servlet</servlet-name>
+    <servlet-class>assignment.servlets.Student_Assignment_Servlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>Student_Assignment_Servlet</servlet-name>
+    <url-pattern>/Student_Assignment_Servlet</url-pattern>
   </servlet-mapping>
 </web-app>

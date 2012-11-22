@@ -1,5 +1,5 @@
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
-    pageEncoding="ISO-8859-1"%>
+<%-- <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+    pageEncoding="ISO-8859-1"%> --%>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
@@ -59,41 +59,21 @@ Database Project
 &nbsp;
 </td>
 </tr>
+
+<% String[][] data = (String[][])request.getAttribute("sectionData"); 
+for(int i=0; i<data.length; i++){
+if(data[i][0] != null){%>
 <tr>
 <td class="centertable normalfont">
-<a href="">Section 1</a>
+<% out.println("<a href=\"student_section_servlet_path?id="+data[i][3]+"\">"+data[i][0]+"</a>");%>
 </td>
-<td class="centertable normalfont">2</td>
-<td class="centertable normalfont">11/27/2012</td>
+<td class="centertable normalfont"><% out.println(data[i][1]); %></td>
+<td class="centertable normalfont"><% if(data[i][2] != null) {
+	out.println(data[i][2]); 
+	}%></td>
 </tr>
-<tr>
-<td class="centertable normalfont">
-<a href="">Section 2</a>
-</td>
-<td class="centertable normalfont">5</td>
-<td class="centertable normalfont">11/22/2012</td>
-</tr>
-<tr>
-<td class="centertable normalfont">
-<a href="">Section 3</a>
-</td>
-<td class="centertable normalfont">3</td>
-<td class="centertable normalfont">12/05/2012</td>
-</tr>
-<tr>
-<td class="centertable normalfont">
-<a href="">Section 4</a>
-</td>
-<td class="centertable normalfont">1</td>
-<td class="centertable normalfont">11/29/2012</td>
-</tr>
-<tr>
-<td class="centertable normalfont">
-<a href="">Section 5</a>
-</td>
-<td class="centertable normalfont">0</td>
-<td class="centertable normalfont"></td>
-</tr>
+<% }
+}%>
 
 <tr>
 <td>

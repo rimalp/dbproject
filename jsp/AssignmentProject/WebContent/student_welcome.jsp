@@ -89,7 +89,8 @@ http://www.java-forums.org/java-servlet/12717-how-call-method-servet-using-jsp.h
 http://stackoverflow.com/questions/2354293/calling-a-java-method-in-jsp
 -->
 <% String[][] data=(String[][])request.getAttribute("data");
-//out.println("<h1>"+data[0][0]+"</h1>");%>
+//out.println("<h1>"+data[0][0]+"</h1>");
+//change href to include section crn as id thing...%>
 
 <table border="0" cellpadding="0" cellspacing="9" width="100%" class="normalfont">
 <% for(int i=0; i<data.length; i++){ 
@@ -97,7 +98,7 @@ if(data[i][0] != null){%>
 <tr class="normalfont">
 <td>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<% out.print("<a href=\"student_section_servlet_path\">"+data[i][0]+"</a>");%>
+<% out.print("<a href=\"student_section_servlet_path?id="+data[i][2]+"\">"+data[i][0]+"</a>");%>
 </td>
 <td align="right">
 <% out.print(data[i][1]); %>
