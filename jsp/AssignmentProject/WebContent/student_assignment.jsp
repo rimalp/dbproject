@@ -71,7 +71,7 @@ if(data[i][0] != null) {%>
 
 <tr>
 <td class="centertable normalfont">
-<% out.println("<a href=\"student_assignment_servlet_path\">"+data[i][0]+"</a>"); %>
+<% out.println("<a href=\"student_assignment_servlet_path?id="+data[i][3]+"\">"+data[i][0]+"</a>"); %>
 </td>
 <td class="centertable normalfont"><% out.println(data[i][1]); %></td>
 <td class="centertable normalfont"><% out.println(data[i][2]); %></td>

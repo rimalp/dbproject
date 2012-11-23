@@ -97,12 +97,13 @@ public class Student_Welcome_Servlet extends HttpServlet {
 			System.out.println("Assignments PRESSED");
 			//section, description, type, deadline
 			//not sure we have a type column in the database
-			query = String.format("SELECT name, description, to_date(deadline, 'YYYY-MM-DD') FROM assignments, takes WHERE takes.email='%s' AND takes.CRN=assignments.CRN AND to_date(deadline, 'YYYY-MM-DD') >= CURRENT_DATE ORDER BY deadline ASC", email);
+			//query = String.format("SELECT name, description, to_date(deadline, 'YYYY-MM-DD'), assignments.assignmentID FROM assignments, takes WHERE takes.email='%s' AND takes.CRN=assignments.CRN AND to_date(deadline, 'YYYY-MM-DD') >= CURRENT_DATE ORDER BY deadline ASC", email);
+			query = String.format("SELECT name, description, to_date(deadline, 'YYYY-MM-DD'), assignments.assignmentID FROM assignments, takes WHERE assignments.assignmentID IN (SELECT DISTINCT assignmentID FROM questions) AND takes.email='%s' AND takes.CRN=assignments.CRN AND to_date(deadline, 'YYYY-MM-DD') >= CURRENT_DATE ORDER BY deadline ASC", email);
 			rs = queryDB(query);
 			
 			String[][] currentAssignmentData= fillAssignmentData(rs);
 			
-			query="SELECT name, description, to_date(deadline, 'YYYY-MM-DD')::TEXT FROM assignments, takes WHERE takes.email='"+email+"' AND takes.CRN=assignments.CRN AND to_date(deadline, 'YYYY-MM-DD') < CURRENT_DATE ORDER BY deadline ASC";
+			query="SELECT name, description, to_date(deadline, 'YYYY-MM-DD')::TEXT, assignments.assignmentID FROM assignments, takes WHERE assignments.assignmentID IN (SELECT DISTINCT assignmentID FROM questions) AND takes.email='"+email+"' AND takes.CRN=assignments.CRN AND to_date(deadline, 'YYYY-MM-DD') < CURRENT_DATE ORDER BY deadline ASC";
 			rs= queryDB(query);
 			
 			String[][] oldAssignmentData=fillAssignmentData(rs);
@@ -156,11 +157,11 @@ public class Student_Welcome_Servlet extends HttpServlet {
 			int i=0;
 			while(rs.next())
 			{
-				//System.out.println("HERGERGEG: "+rs.getString(1));
+				System.out.println("HERGERGEG: "+rs.getString(1));
 				r[i][0]=rs.getString(1);
 				r[i][1]=rs.getString(2);
 				r[i][2]=rs.getString(3);
-				//r[i][3]=rs.getString(4);
+				r[i][3]=Integer.toString(rs.getInt(4));
 				i++;
 			}
 		}catch(SQLException e) { System.out.println("SQLEXCEPTION: "+e); }
