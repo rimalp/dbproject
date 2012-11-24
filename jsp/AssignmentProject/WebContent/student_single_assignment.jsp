@@ -62,7 +62,9 @@ Database Project
 </table></CENTER>
 <hr/>
 
+<%@ page import="java.util.ArrayList, java.util.Arrays"; %>
 <% String[][] questions= (String[][])request.getAttribute("questions");
+ArrayList<String> prevAnswers=new ArrayList(Arrays.asList((String[])request.getAttribute("answersGiven")));
 %>
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -73,10 +75,13 @@ Database Project
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 <p><% out.println(questions[i][0]); %></p>
 <form>
-<% int num=1;
+<% int num=1; int q=0;
 while(i<questions.length && questions[i][0].equals(questions[i+1][0])) {%>
-<% out.println("<input type=\"radio\" name=\"answer\" value=\""+num+"\">"+questions[i][1]); %><br/>
-<% num++;
+<% String c="";
+//if student has selected this answer before, check the box
+if(prevAnswers.contains(questions[i][3])){ c="checked"; }
+out.println("<input type=\"radio\" name=\"answer"+q+"\" value=\""+questions[i][3]+"\" "+c+">"+questions[i][1]); %><br/>
+<% num++; q++;
 i++;
 } 
 }

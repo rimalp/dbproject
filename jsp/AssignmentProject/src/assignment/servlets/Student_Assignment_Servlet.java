@@ -73,17 +73,16 @@ public class Student_Assignment_Servlet extends HttpServlet {
 			
 			String[][] q = questionArray(rs);
 			
-			/*for(int w=0; w<q.length; w++)
-			{
-				System.out.println(w+": "+q[w][0]);
-				if(w==20){ w=q.length; }
-			}*/
-			//get previous student answers
-			//query="SELECT questions.prompt, student.answerID FROM students, questions, answers WHERE email='"+email+"' AND answers.prompt=questions.prompt AND answers.assignmentID=questions.assignmentID AND answers.assignmentID="+assignmentID+" AND student.answerID=answer.answerID ORDER BY questions.prompt ";
+			//get student answers
+			//not sure this is right... where do we store student answers???
+			query="SELECT answerID FROM students WHERE answerID IN (SELECT answerID FROM questions, answers WHERE questions.prompt=answers.prompt AND answers.assignmentID=questions.assignmentID AND answers.assignmentID="+assignmentID+")";
 			
+			rs=queryDB(query);
+			String[] answersGiven=fillAnswers(rs);
 			
 			try{
 				request.setAttribute("questions", q);
+				request.setAttribute("answersGiven", answersGiven);
 				request.getRequestDispatcher("student_single_assignment.jsp").forward(request, response);
 			}catch(IOException e) { System.out.println("ioexception: "+e); }
 			catch (ServletException e) { System.out.println("servlet exception: "+e); }
@@ -108,11 +107,56 @@ public class Student_Assignment_Servlet extends HttpServlet {
 		}catch(SQLException e) { System.out.println("SQLEXCEPTION: "+e); }
 		return r;
 	}
+	
+	private String[] fillAnswers(ResultSet rs)
+	{
+		String[] r=new String[100];
+		try{
+			int i=0;
+			while(rs.next())
+			{
+				//System.out.println("questionArray: "+r[i][0]);
+				r[i]=Integer.toString(rs.getInt(1));
+				i++;
+			}
+		}catch(SQLException e) { System.out.println("SQLEXCEPTION: "+e); }
+		return r;
+	}
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
+		System.out.println("dopost assignment servlet");
+		
+		if(request.getParameter("Save") != null)
+		{
+			int i=0;
+			while(request.getParameter("answer"+i) != null)
+			{
+				try{
+					//HERHEHRERHEHREHR
+					//where do we put student answers in the db?
+					sql.executeUpdate("UPDATE students SET");
+				}catch(Exception e) { System.out.println("ERROR: "+e); }
+				i++;
+			}
+			
+			
+			
+			//save checked answers
+			//show same page with with "SAVED" written at top
+			//same as doget??
+		}
+		else if(request.getParameter("Submit") != null)
+		{
+			//save answers
+			//show grade with same page and correct answers
+		}
+		else
+		{
+			
+		}
 	}
 
 	private ResultSet queryDB(String query)
