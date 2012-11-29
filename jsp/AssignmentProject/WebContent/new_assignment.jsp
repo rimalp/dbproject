@@ -1,9 +1,9 @@
+
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
-<% String[] info = (String[])request.getAttribute("info"); %>
 <title>
-<% out.println(info[0]); %>
+Section 1
 </title>
 <style type="text/css">
 <!--
@@ -41,7 +41,10 @@ button, button:focus, button:active {
 <td style="width: 190px;" class="marginbackground">
 
 
+
+
 <%@ include file="professor_left_links.jsp" %>
+
 
 
 </td>
@@ -63,62 +66,32 @@ Database Project
 </table></CENTER>
 <hr/>
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<b class="headerfont"><% out.println(info[0]); %></b><br/><br/>
+
+<!-- jsp here to get section name -->
+
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<b class="bigbigfont">Assignments</b> (Sort by <button name="byType" type="button">Assignment Type</button>, <button name="byDeadline" type="button">Deadline</button>, <button name="other" type="button">More Sorts</button>):<br/><!-- options for sorting by practice/uploaded, deadline(default), others? each is a button-->
+<b class="headerfont">Section 1: New Assignment</b><br/><br/>
 
-<table border="0" cellpadding="0" cellspacing="9" width="100%" class="normalfont">
-<tr>
-<td class="bigfont">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Name</b></td>
-<td class="centertable bigfont"><b>Description</b></td>
-<td class="centertable bigfont"><b>Deadline</b></td>
-</tr>
-
-<% String[][] assignments = (String[][])request.getAttribute("assignments");
-for(int i=0; i<assignments.length; i++){
-if(assignments[i][0] != null){%>
-<tr>
-<td class="normalfont">
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<% out.println("<a href=\"professor_assignment_servlet_path?id="+assignments[i][3]+"\">"+assignments[i][0]+"</a>"); %></td>
-<td class="centertable normalfont"><% out.println(assignments[i][1]); %></td>
-<td class="centertable normalfont"><% out.println(assignments[i][2]); %></td>
-</tr>
-<% }
-}%>
-
-</table>
-
-<!-- option to add an assignment HERE -->
+<form method="post" action="make_assignment_servlet?id=new">
+Enter a name for the assignment:<input type="text" name="name"><br/>
+Enter Deadline (MM/DD/YYYY):<input type="text" name="deadline"><br/>
 <br/>
-<% out.println("<a href=\"make_assignment_servlet?edit="+request.getAttribute("CRN")+"\">Add Assignment</a>");%>
-<!--  <button name="newAssignment" type="button">Add Assignment</button> -->
+Enter the total number of questions for this assignment:<input type="text" name="numQuestions"><br/>
 
-<br/>
-<br/>
+<!--
+Enter question: <input type="text"><br/>
+Enter up to 4 potential answers:<br/>
+1) <input type="text"><br/>
+2) <input type="text"><br/>
+3) <input type="text"><br/>
+4) <input type="text"><br/>
+Path of any images needed for this problem: <input type="text"><br/>
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<b class="bigbigfont">Section Information:</b><br/><!-- course title, time, day, room -->
-<table border="0" cellpadding="0" cellspacing="9" width="100%" class="normalfont">
-<tr>
-<td class="bigfont">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Course Title</b></td>
-<td class="centertable bigfont"><b>Location</b></td>
-<td class="centertable bigfont"><b>Days</b></td>
-<td class="centertable bigfont"><b>Time</b></td>
-</tr>
-<tr>
-<td class="normalfont">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<% out.println(info[0]); %></td>
-<td class="centertable normalfont">Room <% out.println(info[1]); %></td>
-<td class="centertable normalfont"><% out.println(info[2]); %></td>
-<td class="centertable normalfont"><% out.println(info[3]); %></td>
-</tr>
-</table>
+<input type="Submit" name="addQuestion" value="Add Another Question"> <input type="Submit" name="done" value="Save Assignment">
+-->
 
-
-
+</form>
 
 <table border="0" cellspacing="0" cellpadding="2" width="100%">
 <tr style="height: 5px">

@@ -15,12 +15,11 @@ import javax.servlet.http.HttpSession;
 import assignment.db.DatabaseManager;
 
 /**
- * Servlet implementation class Student_Assignment_Servlet
+ * Servlet implementation class Professor_Assignment_Servlet
  */
-public class Student_Assignment_Servlet extends HttpServlet {
+public class Professor_Assignment_Servlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
-	
 	
 	private DatabaseManager manager;
 	private static Statement sql;
@@ -39,14 +38,14 @@ public class Student_Assignment_Servlet extends HttpServlet {
 
 		}
 
-		System.out.println("STUDENT ASSIGNMENT SERVLET INIT...Inside the init method, the value of sql Statement object: " + sql);
+		System.out.println("PROFESSOR ASSIGNMENT SERVLET INIT...Inside the init method, the value of sql Statement object: " + sql);
 
 	}
 	
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public Student_Assignment_Servlet() {
+    public Professor_Assignment_Servlet() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -56,13 +55,16 @@ public class Student_Assignment_Servlet extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		System.out.println("student assignment servlet do get");
+		
+		//simply view the questions in an assignment
+		//option to add question... takes you to another page
+		System.out.println("professor assignment servlet do get");
 		
 		String assignmentID = (String)request.getParameter("id");
 		System.out.println("assignment id: "+assignmentID);
 		
 		//get assignment name and section name and set two parameters 
-		//to get information to single assignment page
+		//to get information to view assignment page
 		String sectionQ="SELECT course FROM assignments, sections WHERE assignmentID='"+assignmentID+"' AND assignments.CRN=sections.CRN";
 		String assignmentQ="SELECT name FROM assignments WHERE assignmentID='"+assignmentID+"'";
 		
@@ -92,24 +94,37 @@ public class Student_Assignment_Servlet extends HttpServlet {
 			
 			String[][] q = questionArray(rs);
 			
-			//get student answers
-			//not sure this is right... where do we store student answers???
-			//HERHERHERHERHEHREHRHEHRHE
-			query="SELECT answerID FROM students WHERE answerID IN (SELECT answerID FROM questions, answers WHERE questions.prompt=answers.prompt AND answers.assignmentID=questions.assignmentID AND answers.assignmentID="+assignmentID+")";
-			
-			rs=queryDB(query);
-			String[] answersGiven=fillAnswers(rs);
 			
 			try{
 				request.setAttribute("section", section);
 				request.setAttribute("assignment", assignment);
 				request.setAttribute("questions", q);
-				request.setAttribute("answersGiven", answersGiven);
-				request.getRequestDispatcher("student_single_assignment.jsp").forward(request, response);
+				request.getRequestDispatcher("professor_view_assignment.jsp").forward(request, response);
 			}catch(IOException e) { System.out.println("ioexception: "+e); }
 			catch (ServletException e) { System.out.println("servlet exception: "+e); }
 			
 		}
+	}
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		
+		//EDIT BUTTON GOES HERE
+		System.out.println("DOPOST prof assignment servlet");
+		String pressed=request.getParameter("Edit");
+		
+		if(pressed.equals("Edit"))
+		{
+			//get same info then redirect to an assignment editing page
+		}
+		else
+		{
+			
+		}
+		
 	}
 
 	private String[][] questionArray(ResultSet rs)
@@ -130,57 +145,6 @@ public class Student_Assignment_Servlet extends HttpServlet {
 		return r;
 	}
 	
-	private String[] fillAnswers(ResultSet rs)
-	{
-		String[] r=new String[100];
-		try{
-			int i=0;
-			while(rs.next())
-			{
-				//System.out.println("questionArray: "+r[i][0]);
-				r[i]=Integer.toString(rs.getInt(1));
-				i++;
-			}
-		}catch(SQLException e) { System.out.println("SQLEXCEPTION: "+e); }
-		return r;
-	}
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		System.out.println("dopost assignment servlet");
-		
-		if(request.getParameter("Save") != null)
-		{
-			int i=0;
-			while(request.getParameter("answer"+i) != null)
-			{
-				try{
-					//HERHEHRERHEHREHR
-					//where do we put student answers in the db?
-					sql.executeUpdate("UPDATE students SET");
-				}catch(Exception e) { System.out.println("ERROR: "+e); }
-				i++;
-			}
-			
-			
-			
-			//save checked answers
-			//show same page with with "SAVED" written at top
-			//same as doget??
-		}
-		else if(request.getParameter("Submit") != null)
-		{
-			//save answers
-			//show grade with same page and correct answers
-		}
-		else
-		{
-			
-		}
-	}
-
 	private ResultSet queryDB(String query)
 	{
 		ResultSet rs = null;
@@ -198,4 +162,5 @@ public class Student_Assignment_Servlet extends HttpServlet {
 		}
 		return rs;
 	}
+	
 }

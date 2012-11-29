@@ -1,9 +1,12 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
+<% String[][] questions= (String[][])request.getAttribute("questions");
+String assignment=(String)request.getAttribute("assignment");
+String section = (String)request.getAttribute("section");
+%>
 <head>
-<% String[] info = (String[])request.getAttribute("info"); %>
 <title>
-<% out.println(info[0]); %>
+<% out.println(assignment); %>
 </title>
 <style type="text/css">
 <!--
@@ -63,61 +66,39 @@ Database Project
 </table></CENTER>
 <hr/>
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<b class="headerfont"><% out.println(info[0]); %></b><br/><br/>
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<b class="bigbigfont">Assignments</b> (Sort by <button name="byType" type="button">Assignment Type</button>, <button name="byDeadline" type="button">Deadline</button>, <button name="other" type="button">More Sorts</button>):<br/><!-- options for sorting by practice/uploaded, deadline(default), others? each is a button-->
+<b class="headerfont"><% out.println(section+": "+assignment); %></b><br/><br/>
 
-<table border="0" cellpadding="0" cellspacing="9" width="100%" class="normalfont">
-<tr>
-<td class="bigfont">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Name</b></td>
-<td class="centertable bigfont"><b>Description</b></td>
-<td class="centertable bigfont"><b>Deadline</b></td>
-</tr>
-
-<% String[][] assignments = (String[][])request.getAttribute("assignments");
-for(int i=0; i<assignments.length; i++){
-if(assignments[i][0] != null){%>
-<tr>
-<td class="normalfont">
+<% for(int i=0; i<questions.length; i++){
+	if(questions[i][0] != null){%>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<% out.println("<a href=\"professor_assignment_servlet_path?id="+assignments[i][3]+"\">"+assignments[i][0]+"</a>"); %></td>
-<td class="centertable normalfont"><% out.println(assignments[i][1]); %></td>
-<td class="centertable normalfont"><% out.println(assignments[i][2]); %></td>
-</tr>
-<% }
+<p><% out.println(questions[i][0]); %></p>
+<form>
+<% int num=1;
+//if questions null, download link?
+while(i<questions.length && questions[i][0].equals(questions[i+1][0])) {%>
+<%
+out.println(num+") "+questions[i][1]);
+%>
+<br/>
+<br/>
+<% num++;
+i++;
+}
+%>
+<br/>
+<br/>
+<br/>
+</form>
+<%
+}
 }%>
 
-</table>
-
-<!-- option to add an assignment HERE -->
-<br/>
-<% out.println("<a href=\"make_assignment_servlet?edit="+request.getAttribute("CRN")+"\">Add Assignment</a>");%>
-<!--  <button name="newAssignment" type="button">Add Assignment</button> -->
-
-<br/>
-<br/>
-
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<b class="bigbigfont">Section Information:</b><br/><!-- course title, time, day, room -->
-<table border="0" cellpadding="0" cellspacing="9" width="100%" class="normalfont">
-<tr>
-<td class="bigfont">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Course Title</b></td>
-<td class="centertable bigfont"><b>Location</b></td>
-<td class="centertable bigfont"><b>Days</b></td>
-<td class="centertable bigfont"><b>Time</b></td>
-</tr>
-<tr>
-<td class="normalfont">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<% out.println(info[0]); %></td>
-<td class="centertable normalfont">Room <% out.println(info[1]); %></td>
-<td class="centertable normalfont"><% out.println(info[2]); %></td>
-<td class="centertable normalfont"><% out.println(info[3]); %></td>
-</tr>
-</table>
-
-
+<form method="post" action="professor_assignment_servlet_path">
+<input type="Submit" name="Edit" value="Edit">
+</form>
+<!-- edit button for professors -->
 
 
 <table border="0" cellspacing="0" cellpadding="2" width="100%">

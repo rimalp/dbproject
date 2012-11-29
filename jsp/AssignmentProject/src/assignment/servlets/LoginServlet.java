@@ -76,12 +76,12 @@ public class LoginServlet extends HttpServlet {
 		ResultSet assignmentCount = queryDB(countQuery);
 		String[][] data = addStudentCount(assignmentCount);
 		
-		System.out.println("TESTSTSTSTSTS");
+		/*System.out.println("TESTSTSTSTSTS");
 		//test print for this data
 		for(int i=0; i<data.length; i++)
 		{
 			System.out.println(data[i][0]+" "+data[i][1]+" "+data[i][2]+" "+data[i][3]);
-		}
+		}*/
 		
 		try{
 			request.setAttribute("data", data);

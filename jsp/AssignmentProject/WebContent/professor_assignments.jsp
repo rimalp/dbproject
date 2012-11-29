@@ -1,23 +1,9 @@
-<%-- <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
-    pageEncoding="ISO-8859-1"%> --%>
-<!--
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html>
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>Insert title here</title>
-</head>
-<body>
-
-</body>
-</html> -->
-
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
 <title>
-Home
+Assignments
 </title>
 <style type="text/css">
 <!--
@@ -26,8 +12,8 @@ Home
 .darkbackgroundwithnormalfont {background-image: url(../gifs/brushed_metal_dkblue.jpg); font-size: 11pt; font-family: "Geneva, Arial, Helvetica, sans-serif"; color: black; }
 .darkbackgroundwithhugefont {background-image: url(../gifs/brushed_metal_dkblue.jpg); font-size: 15pt; font-family: "Geneva, Arial, Helvetica, sans-serif"; color: black; }
 .normalfontwithred {font-size: 11pt; font-family: "Geneva, Arial, Helvetica, sans-serif"; color: red;}
-a {text-decoration: none;}
 .centertable {text-align: center; vertical-align: middle;}
+a {text-decoration: none;}
 -->
 </style>
 </head>
@@ -38,7 +24,9 @@ a {text-decoration: none;}
 <td style="width: 190px;" class="marginbackground">
 
 
+
 <%@ include file="professor_left_links.jsp" %>
+
 
 
 
@@ -61,26 +49,17 @@ Database Project
 </table></CENTER>
 <hr/>
 
+
+<h1>Active Assignments</h1>
+
 <form name="otcForm" action="" method="post" enctype="">
 <table border="0" cellpadding="0" cellspacing="9" width="100%" class="normalfont">
+<!-- <table border="0" cellpadding="0" cellspacing="0" width="100%" align="center"> -->
 <tr>
-<td align="left" class="bigfont">
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<b>
-Sections
-</b>
-</td>
-<td align="center" class="bigfont">
-<b>
-Active Assignments
-</b>
-</td>
-<td align="right" class="bigfont">
-<b>
-Number of Students
-</b>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</td>
+<td class="centertable bigfont"><b>Section</b></td>
+<td class="centertable bigfont"><b>Description</b></td>
+<td class="centertable bigfont"><b>Deadline</b></td>
+<td class="centertable bigfont"><b>Completed</b></td>
 </tr>
 <tr>
 <td>
@@ -88,38 +67,78 @@ Number of Students
 </td>
 </tr>
 
-
 <!-- jsp here -->
 
-<% String[][] data=(String[][])request.getAttribute("data"); %>
 
-<% for(int i=0; i<data.length; i++){ 
-if(data[i][0] != null){%>
-<tr class="normalfont">
-<td>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<% out.print("<a href=\"professor_section_servlet_path?id="+data[i][3]+"\">"+data[i][0]+"</a>");%>
+<!-- separate into active and old assignments????? -->
+
+
+<% String[][] data = (String[][])request.getAttribute("assignmentCurrentData");
+for(int i=0; i<data.length; i++){
+if(data[i][0] != null) {%>
+<tr>
+<td class="centertable normalfont">
+<% out.println("<a href=\"professor_assignment_servlet_path?id="+data[i][5]+"\">"+data[i][0]+"</a>"); %>
 </td>
-<td align="center" class="centerable normalfont">
-<% out.print(data[i][1]); %>
-</td>
-<td align="right" class="centerable">
-<% out.print(data[i][2]); %>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</td>
+<td class="centertable normalfont"><% out.println(data[i][1]); %></td>
+<td class="centertable normalfont"><% out.println(data[i][2]); %></td>
+<td class="centertable normalfont"><% out.println(data[i][3]+"/"+data[i][4]); %></td>
 </tr>
 <%}
 }%>
 
 
-
-
+<tr>
+<td>
+&nbsp;
+</td>
+</tr>
 
 </table>
-<br />
 
 
-<br />
+<h1>Old Assignments</h1>
+
+<table border="0" cellpadding="0" cellspacing="9" width="100%" class="normalfont">
+<!-- <table border="0" cellpadding="0" cellspacing="0" width="100%" align="center"> -->
+<tr>
+<td class="centertable bigfont"><b>Section</b></td>
+<td class="centertable bigfont"><b>Description</b></td>
+<td class="centertable bigfont"><b>Deadline</b></td>
+<td class="centertable bigfont"><b>Completed</b></td>
+</tr>
+<tr>
+<td>
+&nbsp;
+</td>
+</tr>
+
+<% data = (String[][])request.getAttribute("assignmentOldData");
+for(int i=0; i<data.length; i++){
+if(data[i][0] != null) {%>
+<tr>
+<td class="centertable normalfont">
+<% out.println("<a href=\"professor_assignment_servlet_path?id="+data[i][5]+"\">"+data[i][0]+"</a>"); %>
+</td>
+<td class="centertable normalfont"><% out.println(data[i][1]); %></td>
+<td class="centertable normalfont"><% out.println(data[i][2]); %></td>
+<td class="centertable normalfont"><% out.println(data[i][3]+"/"+data[i][4]); %></td>
+</tr>
+<%}
+}%>
+
+<tr>
+<td>
+&nbsp;
+</td>
+</tr>
+
+</table>
+
+
+
+
+
 
 
 

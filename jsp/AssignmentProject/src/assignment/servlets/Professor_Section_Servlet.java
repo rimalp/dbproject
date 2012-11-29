@@ -15,15 +15,15 @@ import javax.servlet.http.HttpSession;
 import assignment.db.DatabaseManager;
 
 /**
- * Servlet implementation class Student_Section_Servlet
+ * Servlet implementation class Professor_Section_Servlet
  */
-public class Student_Section_Servlet extends HttpServlet {
+public class Professor_Section_Servlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
 	
 	private DatabaseManager manager;
 	private static Statement sql;
-
+	
 	/**
 	 * @see Servlet#init(ServletConfig)
 	 */
@@ -32,12 +32,9 @@ public class Student_Section_Servlet extends HttpServlet {
 		try{
 			manager = new DatabaseManager();
 			sql = DatabaseManager.getSql();
-		}catch(ClassNotFoundException e){
-
-		}catch(SQLException sqle){
-
-		}
-
+		}catch(ClassNotFoundException e){}
+		catch(SQLException sqle){}
+		
 		System.out.println("Inside the init method, the value of sql Statement object: " + sql);
 
 	}
@@ -45,7 +42,7 @@ public class Student_Section_Servlet extends HttpServlet {
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public Student_Section_Servlet() {
+    public Professor_Section_Servlet() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -56,38 +53,34 @@ public class Student_Section_Servlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		
-		System.out.println("DOGET in student section servlet");
+		String crn=request.getParameter("id");
 		
-		String crn = request.getParameter("id");
-		//now get data for this crn and send to student_section.jsp (single section page)
 		HttpSession session = request.getSession();
 		String email = (String) session.getAttribute("currentEmail");
 		
-		System.out.println("CRN: "+crn);
 		if(crn != null)
 		{
 			ResultSet rs = null;
 			
-			//name descr, deadline
-			//AND to_date(deadline, 'YYYY-MM-DD') >= CURRENT_DATE for only active assignments
-			String assignments = "SELECT name, description, to_date(deadline, 'YYYY-MM-DD')::TEXT, assignmentID FROM assignments, takes WHERE assignments.CRN=takes.CRN AND takes.CRN='"+crn+"' AND takes.email='"+email+"' ORDER BY deadline ASC";
+			//name, descr, deadline
+			//AND to_date(deadline, 'YYYY-MM-DD') >= CURRENT_DATE for only active assigments
+			String assignments = "SELECT name, description, to_date(deadline, 'YYYY-MM-DD')::TEXT, assignmentID FROM assignments, teaches WHERE assignments.CRN=teaches.CRN AND teaches.CRN='"+crn+"' AND teaches.email='"+email+"' ORDER BY deadline ASC";
 			rs = queryDB(assignments);
 			String[][] a = fillA(rs);
 			
 			//title, room, days, time
-			String sectionInfo = "SELECT course, room, day, time FROM sections, takes WHERE sections.CRN='"+crn+"' AND takes.CRN=sections.CRN AND takes.email='"+email+"'";
+			String sectionInfo = "SELECT course, room, day, time FROM sections, teaches WHERE sections.CRN='"+crn+"' AND teaches.CRN=sections.CRN AND teaches.email='"+email+"'";
 			rs=queryDB(sectionInfo);
 			String[] info = fillInfo(rs);
 			
 			try{
+				request.setAttribute("CRN", crn);
 				request.setAttribute("assignments", a);
 				request.setAttribute("info", info);
-				request.getRequestDispatcher("student_section.jsp").forward(request, response);
+				request.getRequestDispatcher("professor_section_page.jsp").forward(request, response);
 			}catch(IOException e) { System.out.println("ioexception: "+e); }
 			catch (ServletException e) { System.out.println("servlet exception: "+e); }
-			
 		}
-		//also sort link options delt with here
 	}
 
 	/**
@@ -151,4 +144,5 @@ public class Student_Section_Servlet extends HttpServlet {
 		}
 		return rs;
 	}
+	
 }

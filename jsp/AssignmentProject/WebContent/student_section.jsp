@@ -1,8 +1,9 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
+<% String[] info = (String[])request.getAttribute("info"); %>
 <title>
-Section 1
+<% out.println(info[0]); %>
 </title>
 <style type="text/css">
 <!--
@@ -63,7 +64,7 @@ Database Project
 <hr/>
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<b class="headerfont">Section 1</b><br/><br/>
+<b class="headerfont"><% out.println(info[0]); %></b><br/><br/>
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 <b class="bigbigfont">Assignments</b> (Sort by <button name="byType" type="button">Assignment Type</button>, <button name="byDeadline" type="button">Deadline</button>, <button name="other" type="button">More Sorts</button>):<br/><!-- options for sorting by practice/uploaded, deadline(default), others? each is a button-->
@@ -76,7 +77,6 @@ Database Project
 </tr>
 
 <% String[][] assignments = (String[][])request.getAttribute("assignments");
-String[] info = (String[])request.getAttribute("info");
 for(int i=0; i<assignments.length; i++){
 if(assignments[i][0] != null){%>
 <tr>
