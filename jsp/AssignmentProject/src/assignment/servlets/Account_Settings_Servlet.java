@@ -63,6 +63,7 @@ public class Account_Settings_Servlet extends HttpServlet {
 		System.out.println(newPassword);
 		String check = request.getParameter("newConfirm");
 		System.out.println(check);
+		
 		if(!newPassword.equals(check))
 		{
 			System.out.println("ERROR updating password");

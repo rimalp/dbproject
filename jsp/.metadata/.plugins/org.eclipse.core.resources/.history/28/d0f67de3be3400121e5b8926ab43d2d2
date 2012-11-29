@@ -1,0 +1,224 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>
+Section 1
+</title>
+<style type="text/css">
+<!--
+.normalfont {font-size: 11pt; font-family: "Geneva, Arial, Helvetica, sans-serif";}
+.bigfont {font-size: 14pt; font-family: "Geneva, Arial, Helvetica, sans-serif";}
+.bigbigfont {font-size: 16pt; font-family: "Geneva, Arial, Helvetica, sans-serif";}
+.darkbackgroundwithnormalfont {background-image: url(../gifs/brushed_metal_dkblue.jpg); font-size: 11pt; font-family: "Geneva, Arial, Helvetica, sans-serif"; color: black; }
+.darkbackgroundwithhugefont {background-image: url(../gifs/brushed_metal_dkblue.jpg); font-size: 15pt; font-family: "Geneva, Arial, Helvetica, sans-serif"; color: black; }
+.normalfontwithred {font-size: 11pt; font-family: "Geneva, Arial, Helvetica, sans-serif"; color: red;}
+.centertable {text-align: center; vertical-align: middle;}
+a {text-decoration: none;}
+.headerfont {font-size: 18pt; font-family: "Geneva, Arial, Helvetica, sans-serif";}
+button, button:focus, button:active {
+    /* NOTE Remove all decorations */
+    border: none;
+    display: inline;
+    margin: 0em;
+    padding: 0em;
+    outline: none;
+    outline-offset: 0em;
+    /* NOTE Look like a link */
+    background: none;
+    color: blue;
+    cursor: pointer;
+    font: inherit;
+    text-decoration: none;
+}
+-->
+</style>
+</head>
+<!-- bgcolor="aqua" -->
+<body class="bodybackground" style="margin-top: 0; margin-left: 0; margin-bottom: 4px; margin-right: 4px">
+<table border="0" cellpadding="0" cellspacing="0" width="875px" style="height: 100%">
+<tr valign="top">
+<td style="width: 190px;" class="marginbackground">
+
+
+<%@ include file="student_left_links.jsp" %>
+
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%" class="normalfont" style="height: 100%" >
+<tr style="height: 61px; border-bottom-width: 0px; " valign="top">
+<td>
+
+</td>
+</tr>
+<tr style="height: 10px;">
+<td>
+&nbsp;
+</td>
+</tr>
+
+<tr class="darkbackgroundwithnormalfont" style="height: 20px;">
+<td align="center">
+<b>
+Student Name
+</b>
+</td>
+</tr>
+<tr style="height: 10px;">
+<td>
+&nbsp;
+</td>
+</tr>
+
+<tr style="height: 35px;">
+<td>
+&nbsp;&nbsp;&nbsp;&nbsp;&#8226;&nbsp;
+<a href="" style="color: darkblue;">
+Home Page
+</a>
+</td>
+</tr>
+
+<tr style="height: 35px;">
+<td>
+&nbsp;&nbsp;&nbsp;&nbsp;&#8226;&nbsp;
+<a href="" style="color: darkblue;">
+Sections
+</a>
+</td>
+</tr>
+
+<tr style="height: 35px;">
+<td>
+&nbsp;&nbsp;&nbsp;&nbsp;&#8226;&nbsp;
+<a href="" style="color: darkblue;">
+Assignments
+</a>
+</td>
+</tr>
+
+<tr style="height: 35px;">
+<td>
+&nbsp;&nbsp;&nbsp;&nbsp;&#8226;&nbsp;
+<a href="" style="color: darkblue;">
+Account Settings
+</a>
+</td>
+</tr>
+
+<tr style="height: 35px;">
+<td>
+&nbsp;&nbsp;&nbsp;&nbsp;&#8226;&nbsp;
+<a href="" style="color: darkblue;">
+Log Out
+</a>
+</td>
+</tr>
+
+<!-- more links here? -->
+
+<tr style="height: 10px;">
+<td>
+&nbsp;
+</td>
+</tr>
+<tr>
+<td>
+&nbsp;
+</td>
+</tr>
+
+<tr style="height: 35px;">
+<td>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="" style="color: darkblue;">
+Help
+</a>
+</td>
+</tr>
+</table>
+
+
+</td>
+<td style="width: 3px; background-color: black;">&nbsp;</td>
+<td valign="top" class="lightbackgroundwithnormalfont" style="width: 686px;">
+<CENTER><table border="0" cellspacing="0" cellpadding="0" width="100%" class="smallfont" style="color: black;">
+<tr class="darkbackgroundwithhugefont" style="height: 35px">
+<td colspan="3" valign="middle" align="center">
+<b>
+Database Project
+</b>
+</td>
+</tr>
+<tr style="height: 5px">
+<td colspan="3">
+&nbsp;
+</td>
+</tr>
+</table></CENTER>
+<hr/>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<b class="headerfont">Section 1</b><br/><br/>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<b class="bigbigfont">Assignments</b> (Sort by <button name="byType" type="button">Assignment Type</button>, <button name="byDeadline" type="button">Deadline</button>, <button name="other" type="button">More Sorts</button>):<br/><!-- options for sorting by practice/uploaded, deadline(default), others? each is a button-->
+
+<table border="0" cellpadding="0" cellspacing="9" width="100%" class="normalfont">
+<tr>
+<td class="bigfont">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Name</b></td>
+<td class="centertable bigfont"><b>Description</b></td>
+<td class="centertable bigfont"><b>Deadline</b></td>
+<tr>
+<td class="normalfont">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Assignment 1</td>
+<td class="centertable normalfont"><a href="">Description of Assignment 1</a></td>
+<td class="centertable normalfont">11/27/2012</td>
+</tr>
+<tr>
+<td class="normalfont">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Assignment 2</td>
+<td class="centertable normalfont"><a href="">Description of Assignment 2</a></td>
+<td class="centertable normalfont">11/30/2012</td>
+</tr>
+</table>
+
+<br/>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<b class="bigbigfont">Section Information:</b><br/><!-- course title, time, day, room -->
+<table border="0" cellpadding="0" cellspacing="9" width="100%" class="normalfont">
+<tr>
+<td class="bigfont">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Course Title</b></td>
+<td class="centertable bigfont"><b>Location</b></td>
+<td class="centertable bigfont"><b>Days</b></td>
+<td class="centertable bigfont"><b>Time</b></td>
+</tr>
+<tr>
+<td class="normalfont">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Section 1: Subtitle</td>
+<td class="centertable normalfont">Room #1</td>
+<td class="centertable normalfont">MWF</td>
+<td class="centertable normalfont">1:15-2:00</td>
+</tr>
+</table>
+
+
+
+
+<table border="0" cellspacing="0" cellpadding="2" width="100%">
+<tr style="height: 5px">
+<td colspan="3">
+&nbsp;
+</td>
+</tr>
+</table>
+</td>
+<td style="width: 3px; background-color: black;">&nbsp;</td>
+<td style="width: 190px" class="marginbackground">
+&nbsp;
+</td>
+</tr>
+</table>
+</body>
+</html>

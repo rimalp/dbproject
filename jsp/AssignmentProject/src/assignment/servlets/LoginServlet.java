@@ -56,9 +56,61 @@ public class LoginServlet extends HttpServlet {
 			//CODE TO DISPLAY HOME PAGE
 			displayStudentHome((String)request.getSession().getAttribute("currentEmail"), request, response);
 		}
+		else if(pressed.equals("professor_home_link"))
+		{
+			displayProfessorHome((String)request.getSession().getAttribute("currentEmail"), request, response);
+		}
 		
 	}
 
+	/*
+	 * diplay the homepage for a professor
+	 */
+	private void displayProfessorHome(String username, HttpServletRequest request, HttpServletResponse response)
+	{
+		String numStudentsQuery="SELECT CRN, COUNT(DISTINCT email) AS num FROM takes WHERE CRN IN (SELECT CRN FROM teaches WHERE email='"+username+"') GROUP BY CRN";
+		//ResultSet rs = queryDB(numStudents);
+		
+		//for professor want course, active assignments, number of students, (crns of sections for links)
+		String countQuery = "SELECT course, COUNT(DISTINCT assignmentID), num, sections.CRN FROM ("+numStudentsQuery+") studentCount, sections, teaches, takes, assignments WHERE studentCount.CRN=teaches.CRN AND sections.CRN=teaches.CRN AND assignments.CRN=teaches.CRN AND teaches.email='"+username+"' AND to_date(deadline, 'YYYY-MM-DD') > CURRENT_DATE GROUP BY course, sections.CRN, num";
+		ResultSet assignmentCount = queryDB(countQuery);
+		String[][] data = addStudentCount(assignmentCount);
+		
+		System.out.println("TESTSTSTSTSTS");
+		//test print for this data
+		for(int i=0; i<data.length; i++)
+		{
+			System.out.println(data[i][0]+" "+data[i][1]+" "+data[i][2]+" "+data[i][3]);
+		}
+		
+		try{
+			request.setAttribute("data", data);
+			request.getRequestDispatcher("professor_welcome.jsp").forward(request, response);
+		}catch(IOException e) { System.out.println("ioexception: "+e); }
+		catch (ServletException e) { System.out.println("servlet exception: "+e); }
+		
+	}
+	
+	private String[][] addStudentCount(ResultSet rs)
+	{
+		String[][] r=new String[10][4];
+		
+		try{
+			int i=0;
+			while(rs.next())
+			{
+				//System.out.println("HERGERGEG: "+count.getString(1));
+				r[i][0]=rs.getString(1);
+				r[i][1]=Integer.toString(rs.getInt(2));
+				r[i][2]=Integer.toString(rs.getInt(3));
+				r[i][3]=rs.getString(4);
+				i++;
+			}
+		}catch(SQLException e) { System.out.println("SQLEXCEPTION: "+e); }
+		
+		return r;
+	}
+	
 	/*
 	 * method to display the homepage of a student
 	 */
@@ -136,8 +188,9 @@ public class LoginServlet extends HttpServlet {
 					//and set variables to be used etc... do same for student portion
 					//http://stackoverflow.com/questions/3608891/pass-variables-from-servlet-to-jsp\
 					
-					response.sendRedirect("professor_welcome.jsp");
-					System.out.println("The button pressed for professor login: " + request.getParameter("login"));
+					displayProfessorHome(username, request, response);
+					//response.sendRedirect("professor_welcome.jsp");
+					//System.out.println("The button pressed for professor login: " + request.getParameter("login"));
 
 				}else {
 					/*
@@ -172,10 +225,23 @@ public class LoginServlet extends HttpServlet {
 			}
 
 		}
+		
+		
 		//Begin test portion//
 		else if(request.getParameter("show") != null)
 		{
 			ResultSet rs = queryDB("SELECT * FROM users LIMIT 5");
+			try{
+				while(rs.next())
+				{
+					out.print("<p>"+rs.getString("email")+" *** "+rs.getString("password"));
+
+				}
+			}catch (SQLException e){ System.out.println("SQL Exception: "+e); }
+			
+			out.println("<p>*****************************************************</p>");
+			
+			rs = queryDB("SELECT * FROM users, professors WHERE users.email=professors.email LIMIT 5");
 			try{
 				while(rs.next())
 				{

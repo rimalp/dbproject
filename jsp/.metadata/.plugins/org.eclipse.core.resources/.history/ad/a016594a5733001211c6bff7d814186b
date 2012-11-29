@@ -1,0 +1,276 @@
+package assignment.servlets;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.*;
+
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import assignment.db.*;
+
+/**
+ * Servlet implementation class login
+ */
+public class LoginServlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	private DatabaseManager manager;
+	private static Statement sql;
+
+	/**
+	 * @see Servlet#init(ServletConfig)
+	 */
+	public void init(ServletConfig config) throws ServletException {
+		super.init(config);
+		try{
+			manager = new DatabaseManager();
+			sql = DatabaseManager.getSql();
+		}catch(ClassNotFoundException e){
+
+		}catch(SQLException sqle){
+
+		}
+
+		System.out.println("Inside the init method, the value of sql Statement object: " + sql);
+
+	}
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		String pressed = request.getParameter("id");
+		System.out.println("LOGGING OUT: "+pressed);
+		if(pressed != null)
+		{
+			request.getSession().removeAttribute("currentEmail");
+			request.getSession().removeAttribute("name");
+			//more?
+			System.out.println("DIRECTING TO INDEX");
+			response.sendRedirect("index.jsp");
+		}
+		
+	}
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+		System.out.println("The SQL object: " + sql);
+
+		response.setContentType("text/html");
+		PrintWriter out = response.getWriter();		
+
+		HttpSession session = request.getSession();
+
+		if(request.getParameter("login") != null){
+
+			String username = request.getParameter("username");
+			String password = request.getParameter("password");
+
+			if(this.validateUser(username, password)){
+				//save the user to the session eobject
+				session.setAttribute("currentEmail", username);
+
+				String name = getUserName(username);
+				session.setAttribute("name", name);
+				System.out.println("NAME: "+name);
+
+				System.out.println("The button pressed: " + request.getParameter("login"));
+
+
+				if(isProfessor(username)){
+					//get everything to be displayed on prof welcome page
+					//and set variables to be used etc... do same for student portion
+					//http://stackoverflow.com/questions/3608891/pass-variables-from-servlet-to-jsp\
+					
+					response.sendRedirect("professor_welcome.jsp");
+					System.out.println("The button pressed for professor login: " + request.getParameter("login"));
+
+				}else {
+					System.out.println("0000000000000000000000000000000000");
+					//result set of (course, assignmentCount) tuples for course with assignments that this student takes
+					//only get active assignments... deadline > currentDate
+					//ERROR: deadline is a varchar (why???) convert to date then compare with current_date
+					String countQuery = "SELECT course, COUNT(DISTINCT assignmentID) FROM sections, takes, assignments WHERE sections.CRN=takes.CRN AND assignments.CRN=takes.CRN AND takes.email='"+username+"' AND assignments.deadline > CURRENT_DATE GROUP BY course";
+					ResultSet assignmentCount = queryDB(countQuery);
+					System.out.println("1111111111111111111111111111");
+					//result set of all courses that this student takes with 0 active assignments...
+					//all courses that this student takes minus those with active assignments
+					String allCourses = "SELECT course FROM sections, takes WHERE takes.CRN=sections.CRN AND takes.email='"+username+"'";
+					String withActive = "SELECT course FROM sections, takes, assignments WHERE sections.CRN=takes.CRN AND assignments.CRN=takes.CRN AND takes.email='"+username+"' AND assignments.deadline > CURRENT_DATE";
+					ResultSet rest = queryDB("("+allCourses+") EXCEPT ("+withActive+")");
+					System.out.println("222222222222222222222222222222");
+					//assumes no student takes more than 10 sections...
+					//could add in checks to grow array if needed or use arraylist
+					String[][] data = studentWelcomeArray(assignmentCount, rest);
+					System.out.println("3333333333333333333333333333333333333333");
+					
+					request.setAttribute("data", data);
+				    request.getRequestDispatcher("student_welcome.jsp").forward(request, response);
+				    
+					//System.out.println("The button pressed for student login: " + request.getParameter("login"));
+
+					//response.sendRedirect("student_welcome.jsp");
+					//response.sendRedirect("student_welcome_path");
+				}
+
+			}else {//wrong user-name/password
+				response.sendRedirect("error.jsp");
+			}
+
+		}
+		//Begin test portion//
+		else if(request.getParameter("show") != null)
+		{
+			ResultSet rs = queryDB("SELECT * FROM users LIMIT 5");
+			try{
+				while(rs.next())
+				{
+					out.print("<p>"+rs.getString("email")+" *** "+rs.getString("password"));
+
+				}
+			}catch (SQLException e){ System.out.println("SQL Exception: "+e); }
+		}
+		/*else if(request.getParameter("change") != null)
+		{
+			ResultSet rs = queryDB(String.format("SELECT * FROM users WHERE email='%s'",request.getParameter("email")));
+			try{
+				while(rs.next())
+				{
+					out.print("<p>"+rs.getString("email")+" *** "+rs.getString("password"));
+
+				}
+			}catch (SQLException e){ System.out.println("SQL Exception: "+e); }
+			//update db
+			try{
+				sql.executeUpdate(String.format("UPDATE users SET password='%s' WHERE email='%s'",request.getParameter("newPass"),request.getParameter("email")));
+				System.out.println("NEW EMAIL: "+request.getParameter("newEmail"));
+				//below not working... why???
+				sql.executeUpdate(String.format("UPDATE users SET email='%s' WHERE email='%s'",request.getParameter("newEmail"),request.getParameter("newEmail")));
+				rs = queryDB(String.format("SELECT * FROM users WHERE email='%s'",request.getParameter("newEmail")));
+				while(rs.next())
+				{
+					out.print("<p>"+rs.getString("email")+" *** "+rs.getString("password"));
+
+				}
+			}catch(SQLException e){ System.out.println("SQLException on update: "+e); }
+		}*/
+		//End test portion//
+		else{
+			response.sendRedirect("index.jsp");
+		}
+	}
+	
+	/*
+	 * takes in a result set of courses and one of courses with number of assignments in the course...
+	 * returns a double array with course name matched with number of assignments in that course and
+	 * 0 if there are none... only takes into account active assignments
+	 */
+	private String[][] studentWelcomeArray(ResultSet count, ResultSet rest)
+	{
+		String[][] r=new String[10][2];
+		
+		try{
+			int i=0;
+			while(count.next())
+			{
+				System.out.println("HERGERGEG: "+count.getString(1));
+				r[i][0]=count.getString(1);
+				r[i][1]=Integer.toString(count.getInt(2));
+				i++;
+			}
+			while(rest.next())
+			{
+				r[i][0]=rest.getString(1);
+				r[i][1]="0";
+			}
+		}catch(SQLException e) { System.out.println("SQLEXCEPTION: "+e); }
+		
+		return r;
+	}
+	
+	private String getUserName(String email)
+	{
+		String r="";
+		ResultSet rs = queryDB(String.format("SELECT first_name, last_name FROM users WHERE email='%s'",email));
+		try{
+			while(rs.next())
+			{
+				r+=rs.getString("first_name")+" "+rs.getString("last_name");
+			}
+		}catch(SQLException e){ System.out.println("SQLException on update: "+e); }
+		return r;
+	}
+
+	//FOR TESTING
+	private ResultSet queryDB(String query)
+	{
+		ResultSet rs = null;
+		try {		
+			if(sql == null) {
+				System.out.println("SQL STATEMENT OBJECT IS EMPTY!");
+			} else {
+				if(sql.isClosed()) {
+					System.err.println("The sql statement object is closed!!!");					
+				}
+				rs = sql.executeQuery(query);
+			}
+		} catch(SQLException e){
+			System.err.println("Exception generated ----> " + e.toString());
+		}
+		return rs;
+	}
+
+
+	private boolean validateUser(String username, String password){
+		String query = String.format("SELECT email, password FROM users WHERE email='%s' AND password='%s'",username, password);
+
+		ResultSet rs = null;
+
+		System.out.println("inside the validateUser() method, rs value initially "  + rs);
+
+		try {
+
+			if(sql == null) {
+				System.out.println("SQL STATEMENT OBJECT IS EMPTY!");
+			} else {
+				if(sql.isClosed()) {
+					System.err.println("The sql statement object is closed!!!");					
+				}
+				rs = sql.executeQuery(query);
+				while(rs.next()){
+					System.out.println(rs.getString("email"));
+					System.out.println(rs.getString("password"));
+					return true;
+				}
+				//save the user to the session object
+			}
+		} catch(SQLException e){
+
+			System.err.println("Exception generated ----> " + e.toString());
+		}
+		return false;
+	}
+
+	private boolean isProfessor(String email){
+
+		String query = String.format("SELECT email FROM professors WHERE email='%s'", email);
+
+		ResultSet rs = null;
+
+		try {
+			sql = DatabaseManager.getSql();
+			rs = sql.executeQuery(query);
+
+			while(rs.next()){
+				return true;
+			}
+		} catch(SQLException e){}
+		catch (ClassNotFoundException ce){}
+		return false;
+	}
+}
