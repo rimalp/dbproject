@@ -69,7 +69,7 @@ public class Student_Section_Servlet extends HttpServlet {
 			ResultSet rs = null;
 			
 			//name descr, deadline
-			String assignments = "SELECT name, description, to_date(deadline, 'YYYY-MM-DD')::TEXT, assignmentID FROM assignments, takes WHERE assignments.CRN=takes.CRN AND takes.email='"+email+"' AND to_date(deadline, 'YYYY-MM-DD') >= CURRENT_DATE ORDER BY deadline ASC";
+			String assignments = "SELECT name, description, to_date(deadline, 'YYYY-MM-DD')::TEXT, assignmentID FROM assignments, takes WHERE assignments.CRN=takes.CRN AND takes.CRN='"+crn+"' AND takes.email='"+email+"' AND to_date(deadline, 'YYYY-MM-DD') >= CURRENT_DATE ORDER BY deadline ASC";
 			rs = queryDB(assignments);
 			String[][] a = fillA(rs);
 			

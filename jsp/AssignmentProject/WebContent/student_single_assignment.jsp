@@ -1,8 +1,14 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
+<%@ page import="java.util.ArrayList, java.util.Arrays" %>
+<% String[][] questions= (String[][])request.getAttribute("questions");
+ArrayList<String> prevAnswers=new ArrayList(Arrays.asList((String[])request.getAttribute("answersGiven")));
+String assignment=(String)request.getAttribute("assignment");
+String section = (String)request.getAttribute("section");
+%>
 <head>
 <title>
-Assignment 1
+<% out.println(assignment); %>
 </title>
 <style type="text/css">
 <!--
@@ -62,13 +68,9 @@ Database Project
 </table></CENTER>
 <hr/>
 
-<%@ page import="java.util.ArrayList, java.util.Arrays"; %>
-<% String[][] questions= (String[][])request.getAttribute("questions");
-ArrayList<String> prevAnswers=new ArrayList(Arrays.asList((String[])request.getAttribute("answersGiven")));
-%>
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<b class="headerfont">Assignment 1: Section 1</b><br/><br/>
+<b class="headerfont"><% out.println(section+": "+assignment); %></b><br/><br/>
 
 <% for(int i=0; i<questions.length; i++){
 	if(questions[i][0] != null){%>
@@ -76,14 +78,19 @@ ArrayList<String> prevAnswers=new ArrayList(Arrays.asList((String[])request.getA
 <p><% out.println(questions[i][0]); %></p>
 <form>
 <% int num=1; int q=0;
+//if questions null, download link?
 while(i<questions.length && questions[i][0].equals(questions[i+1][0])) {%>
 <% String c="";
 //if student has selected this answer before, check the box
 if(prevAnswers.contains(questions[i][3])){ c="checked"; }
 out.println("<input type=\"radio\" name=\"answer"+q+"\" value=\""+questions[i][3]+"\" "+c+">"+questions[i][1]); %><br/>
-<% num++; q++;
+<% num++;
 i++;
-} 
+}
+q++;
+%>
+</form>
+<%
 }
 }%>
 

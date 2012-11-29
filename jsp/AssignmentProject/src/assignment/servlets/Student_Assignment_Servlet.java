@@ -61,6 +61,25 @@ public class Student_Assignment_Servlet extends HttpServlet {
 		String assignmentID = (String)request.getParameter("id");
 		System.out.println("assignment id: "+assignmentID);
 		
+		//get assignment name and section name and set two parameters 
+		//to get information to single assignment page
+		String sectionQ="SELECT course FROM assignments, sections WHERE assignmentID='"+assignmentID+"' AND assignments.CRN=sections.CRN";
+		String assignmentQ="SELECT name FROM assignments WHERE assignmentID='"+assignmentID+"'";
+		
+		ResultSet n=queryDB(sectionQ);
+		String section="";
+		try{
+			n.next();
+			section=n.getString(1);
+		}catch(Exception e){ System.out.println("ERROR: "+e); }
+		
+		n=queryDB(assignmentQ);
+		String assignment="";
+		try{
+			n.next();
+			assignment=n.getString(1);
+		}catch(Exception e){ System.out.println("ERROR: "+e); }
+		
 		HttpSession session = request.getSession();
 		String email = (String) session.getAttribute("currentEmail");
 		
@@ -81,6 +100,8 @@ public class Student_Assignment_Servlet extends HttpServlet {
 			String[] answersGiven=fillAnswers(rs);
 			
 			try{
+				request.setAttribute("section", section);
+				request.setAttribute("assignment", assignment);
 				request.setAttribute("questions", q);
 				request.setAttribute("answersGiven", answersGiven);
 				request.getRequestDispatcher("student_single_assignment.jsp").forward(request, response);
