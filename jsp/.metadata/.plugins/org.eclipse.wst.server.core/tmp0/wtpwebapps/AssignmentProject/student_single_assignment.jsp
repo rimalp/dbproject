@@ -95,7 +95,8 @@ q++;
 }%>
 
 <input type="Submit" name="Save" value="Save"> <input type="Submit" name="Submit" value="Submit">
-
+<!-- do we want a save button ?? (maybe later if time... need to change db)
+when submited, update the assigned table in the db -->
 
 
 <table border="0" cellspacing="0" cellpadding="2" width="100%">

@@ -390,7 +390,7 @@ con = None
 try:
   #CONNECTION TO THE DATABASE
 # con = psycopg2.connect(database='tillquir', user='tillquir', password="Rfsrus", host="tomcat.cs.lafayette.edu")
- con = psycopg2.connect(database='lafworks', user='prabhat', password="", host="localhost")
+ con = psycopg2.connect(database='lafworks', user='postgres', password='abc', host="localhost")
 
  cur = con.cursor()
 
@@ -402,7 +402,7 @@ try:
 
  #create and fille users, students, and professors
  cur.execute("CREATE TABLE users(\
-                email        VARCHAR(50),\
+                email        VARCHAR(50) PRIMARY KEY,\
                 first_name    VARCHAR(20),\
                 last_name    VARCHAR(20),\
                 password    VARCHAR(300),\

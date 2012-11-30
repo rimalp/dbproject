@@ -1,0 +1,173 @@
+package assignment.servlets;
+
+import java.io.IOException;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import assignment.db.DatabaseManager;
+
+/**
+ * Servlet implementation class Make_Assignment_Servlet
+ */
+public class Make_Assignment_Servlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+       
+	
+	private DatabaseManager manager;
+	private static Statement sql;
+
+	/**
+	 * @see Servlet#init(ServletConfig)
+	 */
+	public void init(ServletConfig config) throws ServletException {
+		super.init(config);
+		try{
+			manager = new DatabaseManager();
+			sql = DatabaseManager.getSql();
+		}catch(ClassNotFoundException e){
+
+		}catch(SQLException sqle){
+
+		}
+
+		System.out.println("make ASSIGNMENT SERVLET INIT...Inside the init method, the value of sql Statement object: " + sql);
+
+	}
+	
+    /**
+     * @see HttpServlet#HttpServlet()
+     */
+    public Make_Assignment_Servlet() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+	}
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		System.out.println("MAKE ASSIGNMENT DOPOST....");
+		
+		
+		HttpSession session = request.getSession();
+		String email = (String) session.getAttribute("currentEmail");
+		
+		if(request.getParameter("edit") != null)
+		{
+			//editing existing assignment
+			//from professor view assignment page
+			String crn=request.getParameter("edit");
+		}
+		else if(request.getParameter("id") != null)
+		{
+			//new assignment
+			//from new assignment page
+			String crn=request.getParameter("id");
+			String course="";
+			ResultSet rs=queryDB("SELECT course FROM sections WHERE CRN='"+crn+"'");
+			try{
+				while(rs.next())
+				{
+					course=rs.getString(1);
+				}
+			}catch(Exception e) { System.out.println("ERROR: "+e); }
+			
+			String name=request.getParameter("name");
+			String date=request.getParameter("deadline");
+			String numQs=request.getParameter("numQuestions");
+			String descr=request.getParameter("description");
+			
+			
+            //get last assignment id
+			System.out.println("before max");
+			rs=queryDB("SELECT MAX(assignmentID) FROM assignments");
+			System.out.println("after max");
+			int aID=-1;
+			try{
+				while(rs.next())
+				{
+					aID=rs.getInt(1)+1;
+				}
+			}catch(Exception e) { System.out.println("ERROR: "+e); }
+			
+			//add new assignment to the database
+			System.out.println("before insert");
+            try{
+            	sql.executeUpdate("INSERT INTO assignments VALUES("+aID+", "+name+", "+date+", "+descr+", "+email+", "+crn+")");
+            }catch(SQLException e){ System.out.println("ERROR: "+e); }
+            System.out.println("after insert");
+			
+            //redirect to a page where questions are added
+			try{
+				request.setAttribute("section", course);
+				request.setAttribute("numQs", numQs);
+				request.getRequestDispatcher("add_questions.jsp").forward(request, response);
+			}catch(IOException e) { System.out.println("ioexception: "+e); }
+			catch (ServletException e) { System.out.println("servlet exception: "+e); }
+		}
+		else if(request.getParameter("new") != null)
+		{
+			//from professor section page
+			String crn=request.getParameter("new");
+			System.out.println("NEW: "+crn);
+			//get course name
+			String course="";
+			ResultSet rs=queryDB("SELECT course FROM sections WHERE CRN='"+crn+"'");
+			try{
+				while(rs.next())
+				{
+					course=rs.getString(1);
+				}
+			}catch(Exception e) { System.out.println("ERROR: "+e); }
+			
+			
+			try{
+				request.setAttribute("section", course);
+				request.getRequestDispatcher("new_assignment.jsp").forward(request, response);
+			}catch(IOException e) { System.out.println("ioexception: "+e); }
+			catch (ServletException e) { System.out.println("servlet exception: "+e); }
+		}
+		else if(request.getParameter("questions") != null)
+		{
+			//on button click on the add questions page...
+			//add the questions to the database
+			System.out.println("QUESTIONS");
+		}
+		
+	}
+	
+	private ResultSet queryDB(String query)
+	{
+		ResultSet rs = null;
+		try {		
+			if(sql == null) {
+				System.out.println("SQL STATEMENT OBJECT IS EMPTY!");
+			} else {
+				if(sql.isClosed()) {
+					System.err.println("The sql statement object is closed!!!");					
+				}
+				rs = sql.executeQuery(query);
+			}
+		} catch(SQLException e){
+			System.err.println("Exception generated ----> " + e.toString());
+		}
+		return rs;
+	}
+
+}

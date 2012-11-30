@@ -1,0 +1,121 @@
+change titles for all pages
+for assignments with no questions, display link to some page to print (???)
+
+get links working for professor side
+...
+
+triggers and indexing
+new table... answer history for students ????
+only 1 student has completed each assignment in assigned table... refill and fix function??? :
+
+def populateTeachesAssignmentsTakesAndAssigned(sections, professors, students, cur):
+ r = []
+ id = 0
+ students_hash = {}
+ professors_hash = {}
+
+ for s in sections:
+   numStudents = random.randint(5,20)
+   students_copy = list(students)
+   studentsIn=[]#HERERRERERE
+   for _ in range(numStudents):
+     studentEmail = random.choice(students_copy)
+     students_copy.remove(studentEmail)
+     if studentEmail[0] in students_hash.keys():
+       if students_hash[studentEmail[0]] < 5:
+         cur.execute("INSERT INTO takes VALUES(%s, %s)", [studentEmail[0],
+                                           s[0]] )
+         students_hash[studentEmail[0]] = students_hash[studentEmail[0]] + 1
+         studentsIn+=[studentEmail[0]]#HERERERERERE
+     else:
+       cur.execute("INSERT INTO takes VALUES(%s, %s)", [studentEmail[0],
+                                           s[0]] )
+       students_hash[studentEmail[0]] = 1
+       studentsIn+=[studentEmail[0]]#HERERERERERE
+
+   professors_copy = list(professors)
+   profEmail = random.choice(professors_copy)
+   professors_copy.remove(profEmail)
+
+   if profEmail[0] in professors_hash.keys():
+     if professors_hash[profEmail[0]] < 4:
+       cur.execute("INSERT INTO teaches VALUES(%s, %s)", [profEmail[0],
+                                             s[0]] )
+       professors_hash[profEmail[0]] = professors_hash[profEmail[0]] + 1
+   else:
+     cur.execute("INSERT INTO teaches VALUES(%s, %s)", [profEmail[0],
+                                             s[0]] )
+     professors_hash[profEmail[0]] = 1
+
+   
+   for i in range(random.randint(1,15)):
+     cur.execute("INSERT INTO assignments VALUES(%s, %s, %s, %s, %s,%s)", [id, #assignment ids from int counter
+                                                 s[0] + " assignment #" + str(i+1),
+                                                 genRandomDate(),
+                                                 genString(random.randrange(400)),
+                                                 profEmail[0],
+                                                 s[0]] )
+
+     val=random.choice(studentsIn)#HERERERERERE
+     studentsIn.remove(val)#HERERERERERE
+     cur.execute("INSERT INTO assigned VALUES(%s, %s, %s, %s)", [id,
+                                              val,#HERERERERERERER
+                                              ((random.randint(99, 10000))/100.0), #double with 2 decimal places
+                                              genRandomDate()] )
+     r += [id]
+     id += 1
+ return r
+
+
+
+
+
+
+TRIGGERS
+
+CREATE TRIGGER AddUserStudent
+  AFTER INSERT ON students
+  FOR EACH ROW
+  WHEN (NEW.email NOT IN
+    (SELECT email FROM users))
+  ####weird procedure thing
+
+
+ #this inserts a user after you insert a new student because a student is a user.
+ # cur.execute("CREATE TRIGGER AddUserStudent\
+ #                AFTER INSERT ON students\
+ #                REFERENCING NEW ROW AS newUser\
+ #                FOR EACH ROW\
+ #                WHEN (newUser.email NOT IN\
+ #                  (SELECT email FROM users))\
+ #                INSERT INTO users(email) VALUES(newUser.email)")
+
+ # #this inserts a professor after you insert a new student because a professor is a user.
+ # cur.execute("CREATE TRIGGER AddUserProfessor\
+ #                AFTER INSERT ON professors\
+ #                REFERENCING NEW ROW AS newUser\
+ #                FOR EACH ROW\
+ #                WHEN (newUser.email NOT IN\
+ #                  (SELECT email FROM users))\
+ #                INSERT INTO users(email) VALUES(newUser.email)")
+
+
+ # cur.execute("CREATE TRIGGER AddAssignmentPractice\
+ #                AFTER INSERT ON practices\
+ #                REFERENCING NEW ROW AS newAssignment\
+ #                FOR EACH ROW\
+ #                WHEN (newAssignment.assignmentID NOT IN\
+ #                  (SELECT assignmentID FROM assignments))\
+ #                INSERT INTO assignments(assignmentID) VALUES(newAssignment.assignmentID)")
+ # cur.execute("CREATE TRIGGER AddAssignmentUploaded\
+ #                AFTER INSERT ON uploaded\
+ #                REFERENCING NEW ROW AS newAssignment\
+ #                FOR EACH ROW\
+ #                WHEN (newAssignment.assignmentID NOT IN\
+ #                  (SELECT assignmentID FROM assignments))\
+ #                INSERT INTO assignments(assignmentID) VALUES(newAssignment.assignmentID)")
+
+
+
+
+

@@ -87,85 +87,33 @@ Number of Students
 &nbsp;
 </td>
 </tr>
-<tr class="normalfont">
-<td>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<a href="">
-Section 1
-</a>
-</td>
-<td align="center" class="centerable normalfont">
-2
-</td>
-<td align="right" class="centerable">
-10
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</td>
-</tr>
 
-<tr class="normalfont">
-<td>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<a href="">
-Section 2
-</a>
-</td>
-<td align="center" class="centerable normalfont">
-5
-</td>
-<td align="right" class="centerable">
-12
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</td>
-</tr>
 
-<tr class="normalfont">
-<td>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<a href="">
-Section 3
-</a>
-</td>
-<td align="center" class="centerable normalfont">
-3
-</td>
-<td align="right" class="centerable">
-18
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</td>
-</tr>
+<!-- jsp here -->
 
-<tr class="normalfont">
-<td>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<a href="">
-Section 4
-</a>
-</td>
-<td align="center" class="centerable normalfont">
-1
-</td>
-<td align="right" class="centerable">
-15
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</td>
-</tr>
+<% String[][] data=(String[][])request.getAttribute("data"); %>
 
+<% for(int i=0; i<data.length; i++){ 
+if(data[i][0] != null){%>
 <tr class="normalfont">
 <td>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<a href="">
-Section 5
-</a>
+<% out.print("<a href=\"professor_section_servlet_path?id="+data[i][3]+"\">"+data[i][0]+"</a>");%>
 </td>
 <td align="center" class="centerable normalfont">
-0
+<% out.print(data[i][1]); %>
 </td>
 <td align="right" class="centerable">
-8
+<% out.print(data[i][2]); %>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 </td>
 </tr>
+<%}
+}%>
+
+
+
+
 
 </table>
 <br />

@@ -1,0 +1,111 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>
+Section 1
+</title>
+<style type="text/css">
+<!--
+.normalfont {font-size: 11pt; font-family: "Geneva, Arial, Helvetica, sans-serif";}
+.bigfont {font-size: 14pt; font-family: "Geneva, Arial, Helvetica, sans-serif";}
+.bigbigfont {font-size: 16pt; font-family: "Geneva, Arial, Helvetica, sans-serif";}
+.darkbackgroundwithnormalfont {background-image: url(../gifs/brushed_metal_dkblue.jpg); font-size: 11pt; font-family: "Geneva, Arial, Helvetica, sans-serif"; color: black; }
+.darkbackgroundwithhugefont {background-image: url(../gifs/brushed_metal_dkblue.jpg); font-size: 15pt; font-family: "Geneva, Arial, Helvetica, sans-serif"; color: black; }
+.normalfontwithred {font-size: 11pt; font-family: "Geneva, Arial, Helvetica, sans-serif"; color: red;}
+.centertable {text-align: center; vertical-align: middle;}
+a {text-decoration: none;}
+.headerfont {font-size: 18pt; font-family: "Geneva, Arial, Helvetica, sans-serif";}
+button, button:focus, button:active {
+    /* NOTE Remove all decorations */
+    border: none;
+    display: inline;
+    margin: 0em;
+    padding: 0em;
+    outline: none;
+    outline-offset: 0em;
+    /* NOTE Look like a link */
+    background: none;
+    color: blue;
+    cursor: pointer;
+    font: inherit;
+    text-decoration: none;
+}
+-->
+</style>
+</head>
+<!-- bgcolor="aqua" -->
+<body class="bodybackground" style="margin-top: 0; margin-left: 0; margin-bottom: 4px; margin-right: 4px">
+<table border="0" cellpadding="0" cellspacing="0" width="875px" style="height: 100%">
+<tr valign="top">
+<td style="width: 190px;" class="marginbackground">
+
+
+
+
+<%@ include file="professor_left_links.jsp" %>
+
+
+
+</td>
+<td style="width: 3px; background-color: black;">&nbsp;</td>
+<td valign="top" class="lightbackgroundwithnormalfont" style="width: 686px;">
+<CENTER><table border="0" cellspacing="0" cellpadding="0" width="100%" class="smallfont" style="color: black;">
+<tr class="darkbackgroundwithhugefont" style="height: 35px">
+<td colspan="3" valign="middle" align="center">
+<b>
+Database Project
+</b>
+</td>
+</tr>
+<tr style="height: 5px">
+<td colspan="3">
+&nbsp;
+</td>
+</tr>
+</table></CENTER>
+<hr/>
+
+
+<!-- jsp here to get section name -->
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<b class="headerfont">Section 1: New Assignment</b><br/><br/>
+
+<form method="post" action="make_assignment_servlet?id=">
+Enter a name for the assignment:<input type="text" name="name"><br/>
+Enter Deadline (MM/DD/YYYY):<input type="text" name="deadline"><br/>
+Enter a description of the assignment:<textarea name="description"></textarea><br/>
+Enter the total number of questions for this assignment:<input type="text" name="numQuestions"><br/>
+
+<!--
+Enter question: <input type="text"><br/>
+Enter up to 4 potential answers:<br/>
+1) <input type="text"><br/>
+2) <input type="text"><br/>
+3) <input type="text"><br/>
+4) <input type="text"><br/>
+Path of any images needed for this problem: <input type="text"><br/>
+
+<input type="Submit" name="addQuestion" value="Add Another Question"> <input type="Submit" name="done" value="Save Assignment">
+-->
+
+</form>
+
+<table border="0" cellspacing="0" cellpadding="2" width="100%">
+<tr style="height: 5px">
+<td colspan="3">
+&nbsp;
+</td>
+</tr>
+</table>
+</td>
+<td style="width: 3px; background-color: black;">&nbsp;</td>
+<td style="width: 190px" class="marginbackground">
+&nbsp;
+</td>
+</tr>
+</table>
+</body>
+</html>

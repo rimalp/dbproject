@@ -79,4 +79,34 @@
     <servlet-name>Student_Assignment_Servlet</servlet-name>
     <url-pattern>/student_assignment_servlet_path</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>Professor_Section_Servlet</display-name>
+    <servlet-name>Professor_Section_Servlet</servlet-name>
+    <servlet-class>assignment.servlets.Professor_Section_Servlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>Professor_Section_Servlet</servlet-name>
+    <url-pattern>/professor_section_servlet_path</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>Professor_Assignment_Servlet</display-name>
+    <servlet-name>Professor_Assignment_Servlet</servlet-name>
+    <servlet-class>assignment.servlets.Professor_Assignment_Servlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>Professor_Assignment_Servlet</servlet-name>
+    <url-pattern>/professor_assignment_servlet_path</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>Make_Assignment_Servlet</display-name>
+    <servlet-name>Make_Assignment_Servlet</servlet-name>
+    <servlet-class>assignment.servlets.Make_Assignment_Servlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>Make_Assignment_Servlet</servlet-name>
+    <url-pattern>/make_assignment_servlet</url-pattern>
+  </servlet-mapping>
 </web-app>

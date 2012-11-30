@@ -1,0 +1,679 @@
+import psycopg2
+import sys
+import random
+import string
+import time
+import datetime
+
+
+
+mime_types = [".txt",".cpp",".pdf",".css",".docx",".imap",".ppt"]
+
+#------------------------------------------------------------------
+#This function populates the users table
+def populateUser(cur):
+ students = []
+ professors = []
+ schools = ["lafayette","lehigh","stanford","mit","harvard","usb","ucw","bucknell"]
+ officeNum = 100
+ names1 = ("James", "John", "Robert", "Michael", "William", "David", "Richard", "Charles", "Joseph", "Thomas", "Christopher", "Daniel", "Paul", "Mark", "Donanld", "George", "Kenneth", "Steven", "Edward", "Brian", "Ronald", "Anthony", "Kevin", "Jason", "Matthew", "Gary", "Timothy", "Jose", "Larry", "Jeffrey", "Frank", "Scott", "Eric", "Stehen", "Andrew", "Raymond", "Gregory", "Joshua", "Jerry", "Dennis", "Walter", "Patrick", "Peter", "Mary", "Betty", "Linda", "Barbara", "Jenifer", "Maria", "Susan", "Lisa", "Jackie", "Nancy", "Karen", "Helen", "Sandra", "Donna", "Carol", "Ruth", "Sharon", "Michelle", "Laura", "Ben", "Lucas", "Arthur", "Don", "Randall", "Barry", "Alexander", "Jay", "Jim", "Tom", "Derek", "Franklin", "Cody", "Julian", "Russell")
+ names2 = ("Rimal","Johnson", "Williams", "Johnes", "Brown", "Davis", "Miller", "Wilson", "Moore", "Taylor", "Anderson", "Thomas", "Jackson", "White", "Harris", "Martin", "Thompson", "Garcia", "Martinez", "Robinson", "Clark", "Rodriguez", "Gupta", "Li", "Lee", "Walker", "Lewis", "Walken", "Hall", "Smith", "Stevens", "Reagan", "Taft", "Coolridge", "Roosevelt", "Wood", "Hunter", "Knight", "Cunningham", "Bradley", "Lane", "Carrol", "Fields", "Reid", "Roberts", "Forbes", "Kidd", "Levine", "Downs", "Emerson", "Witt", "Holden", "Merrill", "Britt", "Hooper", "Yang", "Sampson", "Petty", "Larkin")
+ for first in names1:
+   # names2 = names1 #list(set(names2) - first)
+   for last in names2:
+     schoolA = random.choice(schools)
+     schoolB = random.choice(schools)
+     #insert the two users
+     cur.execute("INSERT INTO users VALUES(%s,%s,%s,%s,%s)", (last.lower() + '.' + first.lower() + '@' + schoolA.lower() + '.edu',
+                                           first,
+                                           last,
+                                           last + first[0],
+                                           schoolA ) )
+
+
+     #decide whether each should be a student or a professor
+     chooser1 = random.randint(0,100)
+     chooser2 = random.randint(0,100)
+     if chooser1 > 10:
+       t = insertStudent(first, last, schoolA, cur)
+       students.append((last.lower() + '.' + first.lower() + '@' + schoolA.lower() + '.edu',
+                        first,
+                        last,
+                        last + first[0],
+                        schoolA,
+                        t[0],
+                        t[1]))
+     else:
+       t = insertProf(first, last , schoolA, officeNum, cur)
+       professors.append((last.lower() + '.' + first.lower() + '@' + schoolA.lower() + '.edu',
+                          first,
+                          last,
+                          last + first[0],
+                          schoolA,
+                          t[0],
+                          t[1]))
+
+
+     officeNum = officeNum + 1
+ return (students, professors)
+
+def insertStudent(first, last, school, cur):
+ years = [2013,2014,2015,2016]
+ majors = ["CS","ECE","GEO","ECON","MATH"]
+
+ r = (random.choice(years), random.choice(majors))
+ cur.execute("INSERT INTO students VALUES(%s, %s, %s, %s)",(last.lower() + '.' + first.lower() + '@' + school.lower() + '.edu',\
+                                          r[0],
+                                          r[1],
+                                          random.randint(0,100)) )
+ return r
+
+def insertProf(first, last, school, officeNum, cur):
+ hours = ["10:00-11:00", "11:00-12:00", "2:00-3:00","3:00-4:00", "4:00-5:00"]
+ officePrefix = ["CS","ECE","GEO","ECON","MATH"]
+ r1 = str(random.choice(hours))
+ r2 = str(random.choice(officePrefix))
+ email = last.lower() + '.' + first.lower() + '@' + school.lower() + '.edu'
+ cur.execute("INSERT INTO professors VALUES(%s,%s,%s)", (email,
+                                            r1,
+                                            r2) )
+ r = []
+ r.append(r1)
+ r.append(r2)
+ return r;
+
+#----------------------------------POPULATES THE SECTIONS TABLE-------------------------------------
+def populateSection(cur):#courses are simply the abbreviation for a department plus a 3 digit number... CRNS are dept abreviation + course # + section #
+ sections = []
+ classNums = list(range(101, 500))
+ majors = list(["CS","ECE","GEO","ECON","MATH"])
+ times = ["10:00 - 10:50", "1:10 - 2:00"]
+ days = ["MWF","TR","MW","WF","MTWRF"]
+ rooms = list(range(100,120))
+ rooms += list(range(200,220))
+ rooms += list(range(300,320))
+ for _ in range(300):
+   classNum_list = list(classNums)
+   num = random.choice(classNum_list)
+   classNums.remove(num)
+   majors2 = list(majors)
+   for _ in range(random.randint(1, 4)):
+     if(len(majors2) == 0):
+       break;
+     m = random.choice(majors2)
+     majors2.remove(m)
+     for i in range(random.randint(1,3)): #number of sections
+       t = random.choice(list(times))
+       d = random.choice(list(days))
+       r = random.choice(list(rooms))
+       SQL = "INSERT INTO sections VALUES(%s, %s, %s, %s, %s)"
+       data = [m+str(num)+str(i), m+str(num), t, d, r]
+       cur.execute(SQL, data)
+       sections.append((m+str(num)+str(i),
+                       m+str(num),
+                       t,
+                       d,
+                       r))
+ return sections
+
+#-------------------------POPULATES 'TEACHES' AND 'ASSIGNMENTS' TABLES--------------------------------------
+def populateTeachesAndAssignments(sections, professors, cur): #returns a list of assignment ids
+ r = []
+ id = 0
+ for s in sections:
+   if(len(professors) == 0):
+     break;
+   user = random.choice(professors)
+   email = random.choice(professors)
+   cur.execute("INSERT INTO teaches VALUES(%s, %s)", [email[0], s[0]])
+   for i in range(random.randint(5,15)):
+     #assignment id from int counter
+     values = [id,
+               s[0] + 'Assignment' + str(i+1),
+               genRandomDate(),
+               genString(random.randrange(40)),
+               email[0],
+               s[0] ]
+     cur.execute("INSERT INTO assignments VALUES(%s, %s, %s, %s, %s, %s) ", values)
+     r.append(id)
+     id += 1
+ return r
+
+#----------------------POPULATES 'TAKES' TABLE-------------------------------------
+def populateTakes(sections, students, cur):
+ for s in students:
+   sections_copy = list(sections)
+   for i in range(random.randint(3,5)): # say a student takes 3-5 courses from the selection of courses
+     course = random.choice(sections_copy)
+     sections_copy.remove(course)
+     cur.execute("INSERT INTO takes VALUES(%s,%s)", [s[0], course[0]])
+
+
+#----------------------POPULATES 'MESSAGES' TABLE----------------------------------------------
+def populateMessages(users, cur): #allow users to send messages to themselves
+   
+ start = time.mktime((2011, 10, 10, 2, 50, 9, 1, 48, 0))
+ stop = time.mktime((2012, 10, 10, 2, 50, 9, 1, 48, 0))
+ random_time = random.uniform(int(start), int(stop))
+
+ for i in range(500): #total number of messages to create
+   cur.execute("INSERT INTO messages VALUES(%s, %s, %s, %s, %s, %s)", [i,
+                                            genRandomDate(),
+                                            genString(random.randrange(400)),
+                                            genString(random.randrange(50)),
+                                            random.choice(users)[0],
+                                            random.choice(users)[0]] )
+
+def genString(l):
+ r = ''.join(random.choice(string.digits + string.whitespace + string.ascii_letters) for x in range(l))
+ r = r.replace("/","")
+ r = r.replace("\\","")
+ r = ' '.join(r.split())
+ return r
+#-------------------------------POPULATES 'FRIENDS' TABLE----------------------------------
+def populateFriends(users, cur):
+ for _ in range(600): #total number of pairs of friends to create
+   f = pickFriendPair(users)
+   cur.execute("INSERT INTO friends VALUES(%s,%s)",  [f[0],f[1]] )
+
+def pickFriendPair(u):
+ r = (random.choice(u)[0], random.choice(u)[0])
+ while (r[0] == r[1]):
+   r = (random.choice(u)[0], random.choice(u)[0])
+ return r
+
+#-------------------------------POPULATES 'POSTS' TABLE------------------------------------------
+
+def populatePosts(users, assignmentIDs, cur):
+ for id in range(3000):
+   cur.execute("INSERT INTO posts VALUES(%s,%s,%s,%s,%s,%s)", [id,
+                                         genRandomDate(),
+                                         genString(random.randint(25, 300)),
+                                         random.randint(0, id),
+                                         random.choice(users)[0],
+                                         random.choice(assignmentIDs)] )
+
+
+#--------------------------------POPULATES 'FILES' TABLE--------------------------------------
+
+def populateFiles(users, assignmentIDs, cur):
+ for id in range(600):
+   cur.execute("INSERT INTO files VALUES(%s,%s,%s,%s,%s,%s,%s,%s)", [id,
+                                         genRandomDate(),
+                                         genURL(random.randint(5, 15)),
+                                         random.randint(10, 1000),
+                                         genString(random.randint(1, 30)),
+                                         random.choice(mime_types),
+                                         random.choice(users)[0],
+                                         random.choice(assignmentIDs)] )
+
+   
+#-------------------------POPULATES 'ANSWERS' AND 'QUESTIONS' TABLE-----------------------------------------
+ 
+def populateAnswersAndQuestions(assignmentID, cur): 
+ for id in range(0, 500000, 4):
+   correct = [True, False, False, False]
+   aID = random.choice(assignmentID)
+   qPrompt = genString(random.randint(30,300))
+   for x in range(4):
+    c = genString(random.randint(30,300))
+    p = random.choice(correct)
+    cur.execute("INSERT INTO answers VALUES(%s, %s, %s, %s, %s)", [id+x,
+                                            c,
+                                            aID,
+                                            qPrompt,
+                                            p] )
+    correct.remove(p)
+    if x == 3:
+        cur.execute("INSERT INTO questions VALUES(%s, %s)", [aID,
+                                                        qPrompt])
+
+
+
+#-------------------------POPULATES 'LECTURE_FOLLOWS_READING' TABLE-----------------------------------------
+
+def populateLectureFollowsReading(readingID, lectureID, cur): #multiple lectures can follow a reading
+ for r in readingID:
+   lectureID_copy = list(lectureID)
+   for _ in range(random.randint(0, 3)): #followed by at most 3 lectures
+     randomLecture = random.choice(lectureID_copy)
+     lectureID_copy.remove(randomLecture)
+     cur.execute("INSERT INTO lecture_follows_reading VALUES(%s, %s)", [randomLecture, r] )
+
+def populateReadingForAssignment(readingID, assignmentID, cur): #can have multiple readings for one assignment
+ for a in assignmentID:
+   readingID_copy = list(readingID)
+   for _ in range(random.randint(0, 3)):
+     randomReading = random.choice(readingID_copy)
+     readingID_copy.remove(randomReading)
+     cur.execute("INSERT INTO reading_for_assignment VALUES(%s, %s)", [randomReading, a] )
+
+     
+#--------------------------POPULATES 'TEACHES', 'TAKES', 'ASSIGNED' AND 'ASSIGNMENTS' TABLES-------------------------
+
+def populateTeachesAssignmentsTakesAndAssigned(sections, professors, students, cur):
+ r = []
+ id = 0
+ students_hash = {}
+ professors_hash = {}
+
+ for s in sections:
+   numStudents = random.randint(5,20)
+   students_copy = list(students)
+   for _ in range(numStudents):
+     studentEmail = random.choice(students_copy)
+     students_copy.remove(studentEmail)
+     if studentEmail[0] in students_hash.keys():
+       if students_hash[studentEmail[0]] < 5:
+         cur.execute("INSERT INTO takes VALUES(%s, %s)", [studentEmail[0],
+                                           s[0]] )
+         students_hash[studentEmail[0]] = students_hash[studentEmail[0]] + 1
+     else:
+       cur.execute("INSERT INTO takes VALUES(%s, %s)", [studentEmail[0],
+                                           s[0]] )
+       students_hash[studentEmail[0]] = 1
+
+   professors_copy = list(professors)
+   profEmail = random.choice(professors_copy)
+   professors_copy.remove(profEmail)
+
+   if profEmail[0] in professors_hash.keys():
+     if professors_hash[profEmail[0]] < 4:
+       cur.execute("INSERT INTO teaches VALUES(%s, %s)", [profEmail[0],
+                                             s[0]] )
+       professors_hash[profEmail[0]] = professors_hash[profEmail[0]] + 1
+   else:
+     cur.execute("INSERT INTO teaches VALUES(%s, %s)", [profEmail[0],
+                                             s[0]] )
+     professors_hash[profEmail[0]] = 1
+
+   
+   for i in range(random.randint(1,15)):
+     cur.execute("INSERT INTO assignments VALUES(%s, %s, %s, %s, %s,%s)", [id, #assignment ids from int counter
+                                                 s[0] + " assignment #" + str(i+1),
+                                                 genRandomDate(),
+                                                 genString(random.randrange(400)),
+                                                 profEmail[0],
+                                                 s[0]] )
+
+     cur.execute("INSERT INTO assigned VALUES(%s, %s, %s, %s)", [id,
+                                              studentEmail[0],
+                                              ((random.randint(99, 10000))/100.0), #double with 2 decimal places
+                                              genRandomDate()] )
+     r += [id]
+     id += 1
+ return r
+
+
+
+#-----------------THIS METHOD GENERATES A RANDOM DATE BETWEEN AUG 27 2012 AND FEB 27 2013------------------------
+def genRandomDate(): #returns a random date
+ a = datetime.datetime(2012, 8, 27, 8, 0, 0)
+ b = datetime.timedelta(seconds=random.randint(0, 15552000)) #random time interval upto +180 days
+ return a + b
+
+#-----------------THIS METHOD POPULATES THE 'PRACTICES' TABLE------------------------------
+def populatePractices(assignmentIDs, cur):
+ a = list(assignmentIDs)
+ practices_total = len(a)/3
+ for _ in range(practices_total): #1/3 are practice
+   b = random.choice(a)
+   cur.execute("INSERT INTO practices VALUES(%s, %s)", [b, random.randint(1,10)] )
+   a.remove(b)
+
+
+#---------------------THIS METHOD POPULATES THE 'UPLOADED' TABLE-------------------------------
+def populateUploaded(assignmentIDs, cur):
+ a = list(assignmentIDs)
+ for _ in range(len(assignmentIDs)/3): #1/3 are uploaded
+   b = random.choice(a)
+   cur.execute("INSERT INTO uploaded VALUES(%s, %s)", [b, genRandomDate()] )
+   a.remove(b)
+#--------------------THIS METHOD POPULATES THE 'READINGS' TABLE-------------------------------
+
+def populateReadings(professors, cur):
+ r = []
+ id = 0
+ topics = ["Gen Math","Trig","Calc","Integration","derivatives","Intro","CS","Trees","Linked Lists","Arrays","C","C++"] 
+ books = ["Trig Book","Math Book","Calc Book 1","Calc Book 2","CS Book","CS Langs"] 
+ for p in professors:
+   numReadings = random.randrange(5)
+   for _ in range(numReadings):
+     cur.execute("INSERT INTO readings VALUES( %s, %s, %s, %s, %s, %s)", [id,
+                                              random.choice(topics),
+                                              random.choice(books),
+                                              genPage(),
+                                              genURL(random.randint(5,20)),
+                                              p[0]] )
+     r += [id]
+     id += 1
+ return r
+
+def genPage():
+ a = ''.join(random.choice(string.digits) for x in range(3))
+ return a.join("-".join(random.choice(string.digits) for x in range(3)))
+
+def genURL(n):
+ r ="".join(random.choice(string.ascii_letters) for x in range(n))
+ r = 'http://' + r
+ r = r + '.com'
+ r = r.lower()
+ return r
+
+
+#------------------------THIS METHOD POPULATES THE 'LECTURES' TABLE-------------------------------
+def populateLectures(professors, cur):
+ r = []
+ id = 0
+ for p in professors:
+   numLectures = random.randrange(20)
+   for _ in range(numLectures):
+     cur.execute("INSERT INTO lectures VALUES(%s, %s, %s, %s, %s, %s, %s, %s)", [id,
+                                             genString(random.randint(0,200)),
+                                             genString(random.randint(0,30)),
+                                             genRandomDate(),
+                                             random.randint(10, 1000),
+                                             genURL(random.randint(0,20)),
+                                             random.choice(mime_types),
+                                             p[0]] )
+     r += [id]
+     id += 1
+ return r
+
+# --  THE REST OF THE CODE CREATES TABLES, CALLS THE RESPECTIVE POPULATE FUNCTIONS AND SAVES THE 
+# --  CHANGES TO THE DATABASE 
+
+con = None
+
+#global variables
+
+try:
+  #CONNECTION TO THE DATABASE
+# con = psycopg2.connect(database='tillquir', user='tillquir', password="Rfsrus", host="tomcat.cs.lafayette.edu")
+ con = psycopg2.connect(database='lafworks', user='postgres', password='abc', host="localhost")
+
+ cur = con.cursor()
+
+ #Drop tables if already created in previous occasions
+ cur.execute("DROP TABLE IF EXISTS users, students, professors, \
+             sections, teaches, takes, assignments, messages, friends,\
+             posts, files, answers, practices, uploaded, readings, lectures, assigned,\
+             lecture_follows_reading, reading_for_assignment, questions")
+
+ #create and fille users, students, and professors
+ cur.execute("CREATE TABLE users(\
+                email        VARCHAR(50),\
+                first_name    VARCHAR(20),\
+                last_name    VARCHAR(20),\
+                password    VARCHAR(300),\
+                school        VARCHAR(50))")
+ 
+ cur.execute("CREATE TABLE students(\
+                email        VARCHAR(50) PRIMARY KEY REFERENCES users(email)\
+                                                       ON DELETE CASCADE\
+                                                       ON UPDATE CASCADE,\
+                year        INT CHECK (year=2013 OR year=2014 OR year=2015 OR year=2016),\
+                major        VARCHAR(20),\
+                answerID    INT)")
+ 
+ cur.execute("CREATE TABLE professors(\
+                email        VARCHAR(50) PRIMARY KEY REFERENCES users(email)\
+                                                       ON DELETE CASCADE\
+                                                       ON UPDATE CASCADE,\
+                hours        VARCHAR(100),\
+                office        VARCHAR(100))")
+ usersList = populateUser(cur)
+ con.commit()
+ students = usersList[0]
+ professors = usersList[1]
+ users = students + professors # The first element each user's record list in the list is an email address
+ con.commit()
+
+
+ #create and fill sections
+ cur.execute("CREATE TABLE sections(\
+                CRN        VARCHAR(300) PRIMARY KEY,\
+                course        VARCHAR(300),\
+                time        VARCHAR(50),\
+                day        VARCHAR(50),\
+                room        VARCHAR(100))")
+ sections = populateSection(cur)#returns a list of sections as tuples
+ con.commit()
+
+
+ #create and fill teaches, takes, and assignments
+ cur.execute("CREATE TABLE teaches(\
+                email        VARCHAR(50) REFERENCES users(email)\
+                                           ON DELETE CASCADE\
+                                           ON UPDATE CASCADE,\
+                CRN        VARCHAR(300) REFERENCES sections(CRN)\
+                                           ON DELETE CASCADE\
+                                           ON UPDATE CASCADE,\
+                PRIMARY KEY(email, CRN))")
+ cur.execute("CREATE TABLE takes(\
+                email        VARCHAR(50) REFERENCES users(email)\
+                                           ON DELETE CASCADE\
+                                           ON UPDATE CASCADE,\
+                CRN        VARCHAR(300) REFERENCES sections(CRN)\
+                                           ON DELETE CASCADE\
+                                           ON UPDATE CASCADE,\
+                PRIMARY KEY(email, CRN))")
+ cur.execute("CREATE TABLE assignments(\
+                assignmentID    INT PRIMARY KEY,\
+                name        VARCHAR(300),\
+                deadline    VARCHAR(50),\
+                description    TEXT,\
+                assigner_email    VARCHAR(50) REFERENCES users(email)\
+                                           ON DELETE CASCADE\
+                                           ON UPDATE CASCADE,\
+                CRN        VARCHAR(300) REFERENCES sections(CRN)\
+                                           ON DELETE SET NULL\
+                                           ON UPDATE SET NULL)")
+
+ cur.execute("CREATE TABLE assigned(\
+                  assignmentID INT REFERENCES assignments(assignmentID)\
+                                           ON DELETE CASCADE\
+                                           ON UPDATE CASCADE,\
+                  email    VARCHAR(50) REFERENCES users(email)\
+                                           ON DELETE SET NULL\
+                                           ON UPDATE SET NULL,\
+                  grade    DOUBLE PRECISION CHECK (grade>=0.0),\
+                  submit_time  DATE,\
+                  PRIMARY KEY (assignmentID, email))")
+
+ assignmentIDs = populateTeachesAssignmentsTakesAndAssigned(sections, professors, students, cur)
+ con.commit()
+
+
+ #create and fill table for messages
+ cur.execute("CREATE TABLE messages(\
+                msgID        INT PRIMARY KEY,\
+                date          DATE,\
+                body          TEXT,\
+                header        VARCHAR(300),\
+                reciever_email    VARCHAR(50) REFERENCES users(email),\
+                sender_email    VARCHAR(50) REFERENCES users(email))")
+ populateMessages(users, cur)
+ con.commit()
+
+ #create and fill table for isfriend... called it friends
+ cur.execute("CREATE TABLE friends(\
+                email1        VARCHAR(50) REFERENCES users(email)\
+                                           ON DELETE CASCADE\
+                                           ON UPDATE CASCADE,\
+                email2        VARCHAR(50) REFERENCES users(email)\
+                                           ON DELETE CASCADE\
+                                           ON UPDATE CASCADE,\
+                PRIMARY KEY(email1, email2))")
+ populateFriends(users, cur)
+ con.commit()
+
+ #create and fill practices and uploaded tables
+ #create and fill posts, files, answers tables
+ cur.execute("CREATE TABLE posts(\
+                postID   INT,\
+                date   DATE, \
+                content  TEXT,\
+                last_postID  INT CHECK (last_postID IN (SELECT postID FROM posts)),\
+                poster_email VARCHAR(50) REFERENCES users(email)\
+                                           ON DELETE SET NULL\
+                                           ON UPDATE SET NULL,\
+                assignmentID INT REFERENCES assignments(assignmentID)\
+                                           ON DELETE SET NULL\
+                                           ON UPDATE SET NULL,\
+                PRIMARY KEY(postID, last_postID, poster_email, assignmentID))")
+
+ cur.execute("CREATE TABLE files(\
+                fileID   INT,\
+                date   DATE, \
+                url    VARCHAR(500),\
+                size   INT,\
+                name   VARCHAR(300),\
+                MIME_type  VARCHAR(10),\
+                uploader_email VARCHAR(50),\
+                assignmentID INT REFERENCES assignments(assignmentID)\
+                                           ON DELETE SET NULL\
+                                           ON UPDATE SET NULL,\
+                PRIMARY KEY(fileID, uploader_email, assignmentID))")
+
+ cur.execute("CREATE TABLE answers(\
+                answerID INT,\
+                content  TEXT,\
+                assignmentID INT REFERENCES assignments(assignmentID)\
+                                           ON DELETE CASCADE\
+                                           ON UPDATE CASCADE,\
+                prompt  TEXT,\
+                correct  BOOLEAN)")
+                #PRIMARY KEY(answerID, assignmentID, prompt))")
+
+  #create and fill table for questions
+ cur.execute("CREATE TABLE questions(\
+                assignmentID  INT REFERENCES assignments(assignmentID)\
+                                           ON DELETE CASCADE\
+                                           ON UPDATE CASCADE,\
+                prompt  TEXT)")
+
+                #PRIMARY KEY(assignmentID, prompt))")
+
+ populatePosts(users, assignmentIDs, cur)
+ populateFiles(users, assignmentIDs, cur) #anyone can upload a file
+ populateAnswersAndQuestions(assignmentIDs, cur)
+ con.commit()
+
+
+ cur.execute("CREATE TABLE practices(\
+                assignmentID INT PRIMARY KEY REFERENCES assignments(assignmentID)\
+                                           ON DELETE CASCADE\
+                                           ON UPDATE CASCADE,\
+                num_attempts INT)")
+
+ cur.execute("CREATE TABLE uploaded(\
+                assignmentID INT PRIMARY KEY REFERENCES assignments(assignmentID)\
+                                           ON DELETE CASCADE\
+                                           ON UPDATE CASCADE,\
+                confirm_time TIME)")
+ populatePractices(assignmentIDs, cur)
+ populateUploaded(assignmentIDs, cur)
+ con.commit()
+
+#create and fill readings and lectures
+ cur.execute("CREATE TABLE readings(\
+                readingID  INT,\
+                topic    VARCHAR(300),\
+                book   VARCHAR(300),\
+                page   VARCHAR(50),\
+                url    TEXT,\
+                uploader_email TEXT REFERENCES users(email)\
+                                           ON DELETE SET NULL\
+                                           ON UPDATE SET NULL,\
+                PRIMARY KEY (readingID, uploader_email))")
+
+ cur.execute("CREATE TABLE lectures(\
+                lectureID  INT,\
+                comment  TEXT,\
+                header   VARCHAR(30),\
+                date   DATE,\
+                size   INT,\
+                url    TEXT,\
+                MIME_type  VARCHAR(10),\
+                uploader_email VARCHAR(50) REFERENCES users(email)\
+                                           ON DELETE SET NULL\
+                                           ON UPDATE SET NULL,\
+                PRIMARY KEY (lectureID, uploader_email))")
+
+ readingIDs = populateReadings(professors, cur)
+ lectureIDs = populateLectures(professors, cur)
+ con.commit()
+
+ #create tables for lectureFollowsReading and readingForAssignment
+ cur.execute("CREATE TABLE lecture_follows_reading(\
+                lectureID  INT CHECK (lectureID IN (SELECT lectures.lectureID FROM lectures)),\
+                readingID  INT CHECK (readingID IN (SELECT readings.readingID FROM readings)),\
+                PRIMARY KEY(lectureID, readingID))")
+
+ cur.execute("CREATE TABLE reading_for_assignment(\
+                readingID  INT CHECK (readingID IN (SELECT readings.readingID FROM readings)),\
+                assignmentID INT REFERENCES assignments(assignmentID)\
+                                           ON DELETE CASCADE\
+                                           ON UPDATE CASCADE,\
+                PRIMARY KEY(readingID, assignmentID))")
+
+ populateLectureFollowsReading(readingIDs, lectureIDs, cur)
+ populateReadingForAssignment(readingIDs, assignmentIDs, cur)
+ con.commit()
+
+ #Triggers
+
+ #Drop old triggers first
+ cur.execute("DROP TRIGGER IF EXISTS AddUserStudent ON students")
+ cur.execute("DROP TRIGGER IF EXISTS AddUserProfessor ON professors")
+ cur.execute("DROP TRIGGER IF EXISTS AddAssignmentPractice ON practices")
+ cur.execute("DROP TRIGGER IF EXISTS AddAssignmentUploaded ON uploaded")
+
+ ###########################
+
+ #create triggers
+
+ #this inserts a user after you insert a new student because a student is a user.
+ cur.execute("CREATE TRIGGER AddUserStudent\
+                AFTER INSERT ON students\
+                REFERENCING NEW ROW AS newUser\
+                FOR EACH ROW\
+                WHEN (newUser.email NOT IN\
+                  (SELECT email FROM users))\
+                INSERT INTO users(email) VALUES(newUser.email)")
+
+ #this inserts a professor after you insert a new student because a professor is a user.
+ cur.execute("CREATE TRIGGER AddUserProfessor\
+                AFTER INSERT ON professors\
+                REFERENCING NEW ROW AS newUser\
+                FOR EACH ROW\
+                WHEN (newUser.email NOT IN\
+                  (SELECT email FROM users))\
+                INSERT INTO users(email) VALUES(newUser.email)")
+
+
+ cur.execute("CREATE TRIGGER AddAssignmentPractice\
+                AFTER INSERT ON practices\
+                REFERENCING NEW ROW AS newAssignment\
+                FOR EACH ROW\
+                WHEN (newAssignment.assignmentID NOT IN\
+                  (SELECT assignmentID FROM assignments))\
+                INSERT INTO assignments(assignmentID) VALUES(newAssignment.assignmentID)")
+ cur.execute("CREATE TRIGGER AddAssignmentUploaded\
+                AFTER INSERT ON uploaded\
+                REFERENCING NEW ROW AS newAssignment\
+                FOR EACH ROW\
+                WHEN (newAssignment.assignmentID NOT IN\
+                  (SELECT assignmentID FROM assignments))\
+                INSERT INTO assignments(assignmentID) VALUES(newAssignment.assignmentID)")
+ 
+
+except psycopg2.Error, e:
+ if con:
+   con.rollback()
+ print 'Error %s' % e
+ sys.exit(1)
+finally:
+ if con:
+   con.close()

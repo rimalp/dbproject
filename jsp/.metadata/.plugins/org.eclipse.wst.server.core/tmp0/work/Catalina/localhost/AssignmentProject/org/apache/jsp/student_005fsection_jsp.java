@@ -58,8 +58,11 @@ public final class student_005fsection_jsp extends org.apache.jasper.runtime.Htt
       out.write("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n");
       out.write("<html>\n");
       out.write("<head>\n");
+ String[] info = (String[])request.getAttribute("info"); 
+      out.write("\n");
       out.write("<title>\n");
-      out.write("Section 1\n");
+ out.println(info[0]); 
+      out.write("\n");
       out.write("</title>\n");
       out.write("<style type=\"text/css\">\n");
       out.write("<!--\n");
@@ -228,7 +231,9 @@ out.println(e);
       out.write("<hr/>\n");
       out.write("\n");
       out.write("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\n");
-      out.write("<b class=\"headerfont\">Section 1</b><br/><br/>\n");
+      out.write("<b class=\"headerfont\">");
+ out.println(info[0]); 
+      out.write("</b><br/><br/>\n");
       out.write("\n");
       out.write("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\n");
       out.write("<b class=\"bigbigfont\">Assignments</b> (Sort by <button name=\"byType\" type=\"button\">Assignment Type</button>, <button name=\"byDeadline\" type=\"button\">Deadline</button>, <button name=\"other\" type=\"button\">More Sorts</button>):<br/><!-- options for sorting by practice/uploaded, deadline(default), others? each is a button-->\n");
@@ -241,7 +246,6 @@ out.println(e);
       out.write("</tr>\n");
       out.write("\n");
  String[][] assignments = (String[][])request.getAttribute("assignments");
-String[] info = (String[])request.getAttribute("info");
 for(int i=0; i<assignments.length; i++){
 if(assignments[i][0] != null){
       out.write("\n");
