@@ -71,10 +71,11 @@ Database Project
 
 <% String section=(String)request.getAttribute("section"); 
 int qs = Integer.parseInt((String)request.getAttribute("numQs"));
-String id=(String)request.getAttribute("id"); %>
+int id=((Integer)request.getAttribute("ID")).intValue(); 
+System.out.println("ASSIGNMENT ID SDFSDF SDG DS SDFSDF: "+id);%>
 <b class="headerfont"><% out.println(section); %>: New Assignment</b><br/><br/>
 
-<form method="post" action="make_assignment_servlet?questions=<% out.println(qs); %>&id=<% out.println(id); %>">
+<form method="post" action="make_assignment_servlet?questions=<% out.println(qs); %>&ID=<% out.println(id); %>">
 <% for(int i=0; i<qs; i++){//assume 4 answers per question for now%>
 <% out.println((i+1)+") "); %>Enter question: <% out.println("<input type=\"text\" name=\"question"+i+"\">"); %><br/>
 Enter up to 4 potential answers:<br/>
@@ -87,13 +88,13 @@ Path of any images to be displayed with this problem: <input type="text"><br/>
 <table>
 <tr>
 <td>Mark any correct answers:</td>
-<td>1)<input type="checkbox" name="correct" value="1"></td>
-<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2)<input type="checkbox" name="correct" value="2"></td>
+<td>a)<input type="checkbox" name="correct" value="1"></td>
+<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;b)<input type="checkbox" name="correct" value="2"></td>
 </tr>
 <tr>
 <td></td>
-<td>3)<input type="checkbox" name="correct" value="3"></td>
-<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4)<input type="checkbox" name="correct" value="4"></td>
+<td>c)<input type="checkbox" name="correct" value="3"></td>
+<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;d)<input type="checkbox" name="correct" value="4"></td>
 </tr>
 </table>
 <br/>

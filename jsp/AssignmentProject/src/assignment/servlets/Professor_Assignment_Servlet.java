@@ -126,8 +126,10 @@ public class Professor_Assignment_Servlet extends HttpServlet {
 		//EDIT BUTTON GOES HERE
 		System.out.println("DOPOST prof assignment servlet");
 		String pressed=request.getParameter("Edit");
+		int assignmentid=(Integer)request.getAttribute("id");
+		System.out.println(assignmentid);
 		
-		if(pressed.equals("Edit"))
+		if(pressed != null)
 		{
 			//get same info then redirect to an assignment editing page
 		}

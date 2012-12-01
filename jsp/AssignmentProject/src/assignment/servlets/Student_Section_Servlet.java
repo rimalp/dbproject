@@ -109,7 +109,7 @@ public class Student_Section_Servlet extends HttpServlet {
 				r[i][2]=rs.getString(3);
 				r[i][3]=Integer.toString(rs.getInt(4));
 				
-				//System.out.println("i= "+i+" "+r[i][0]+" "+r[i][1]+" "+r[i][2]+" "+r[i][3]);
+				//System.out.println("i= "+i+" "+r[i][0]+" "+r[i][1]+" date: "+r[i][2]+" "+r[i][3]);
 				i++;
 			}
 		}catch(SQLException e) { System.out.println("SQLEXCEPTION: "+e); }

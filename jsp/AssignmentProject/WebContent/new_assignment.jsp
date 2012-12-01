@@ -69,14 +69,17 @@ Database Project
 
 <!-- jsp here to get section name -->
 <% String section=(String)request.getAttribute("section");
-String crn=(String)request.getAttribute("CRN"); %>
+String crn=(String)request.getAttribute("CRN"); 
+String error=(String)request.getAttribute("error");%>
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 <b class="headerfont"><% out.println(section); %>: New Assignment</b><br/><br/>
 
+<% if(error != null){ out.println("<font color=\"red\">"+error+"</font>"); } %>
+
 <form method="post" action="make_assignment_servlet?id=<% out.println(crn); %>">
 Enter a name for the assignment:<input type="text" name="name"><br/>
-Enter Deadline (MM/DD/YYYY):<input type="text" name="deadline"><br/>
+Enter Deadline (YYYY/MM/DD):<input type="text" name="deadline"><br/>
 Enter a description of the assignment:<br/>
 <textarea name="description"></textarea><br/>
 Number of questions:<input type="text" size="3" name="numQuestions"><br/>

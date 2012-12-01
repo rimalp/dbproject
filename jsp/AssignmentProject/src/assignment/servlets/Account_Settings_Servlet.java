@@ -64,6 +64,10 @@ public class Account_Settings_Servlet extends HttpServlet {
 		String check = request.getParameter("newConfirm");
 		System.out.println(check);
 		
+		//student or professor?
+		boolean isProf=isProfessor((String)request.getSession().getAttribute("currentEmail"));
+		
+		
 		if(!newPassword.equals(check))
 		{
 			System.out.println("ERROR updating password");
@@ -80,7 +84,15 @@ public class Account_Settings_Servlet extends HttpServlet {
 			{
 				updateDB(String.format("UPDATE users SET password='%s' WHERE email='%s'",newPassword,request.getSession().getAttribute("currentEmail")));
 				System.out.println("UPDATED");
-				response.sendRedirect("student_welcome.jsp");
+				if(isProf)
+				{
+					response.sendRedirect("loginpath?id=professor_home_link");
+				}
+				else
+				{
+					response.sendRedirect("loginpath?id=student_home_link");
+				}
+				
 			}
 			else
 			{
@@ -122,5 +134,23 @@ public class Account_Settings_Servlet extends HttpServlet {
 		}
 		return rs;
 	}
+	
+	
+	private boolean isProfessor(String email){
 
+		String query = String.format("SELECT email FROM professors WHERE email='%s'", email);
+
+		ResultSet rs = null;
+
+		try {
+			sql = DatabaseManager.getSql();
+			rs = sql.executeQuery(query);
+
+			while(rs.next()){
+				return true;
+			}
+		} catch(SQLException e){}
+		catch (ClassNotFoundException ce){}
+		return false;
+	}
 }

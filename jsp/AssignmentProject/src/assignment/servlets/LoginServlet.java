@@ -31,9 +31,9 @@ public class LoginServlet extends HttpServlet {
 			manager = new DatabaseManager();
 			sql = DatabaseManager.getSql();
 		}catch(ClassNotFoundException e){
-
+			System.out.println("class not found: "+e);
 		}catch(SQLException sqle){
-
+			System.out.println("sql exception: "+sqle);
 		}
 
 		System.out.println("Inside the init method, the value of sql Statement object: " + sql);
@@ -90,7 +90,7 @@ public class LoginServlet extends HttpServlet {
 		}catch(Exception e) { System.out.println("ERROROROSDGFDFG"); }
 		
 		try{
-			sql.executeUpdate("DELETE FROM assignments WHERE deadline='datesdfs'");
+			sql.executeUpdate("DELETE FROM assignments WHERE deadline='fakeDate'");
 		}catch(Exception e){}
 		t="Select deadline from assignments order by deadline DESC LIMIT 20";
 		temp=queryDB(t);

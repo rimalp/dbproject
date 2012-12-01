@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import assignment.db.DatabaseManager;
+import java.util.regex.Pattern;
 
 /**
  * Servlet implementation class Make_Assignment_Servlet
@@ -91,6 +92,9 @@ public class Make_Assignment_Servlet extends HttpServlet {
 			
 			String name=request.getParameter("name");
 			String date=request.getParameter("deadline");//ADD CHECK HERE
+			
+			System.out.println("DATADATADATATEEEEDATEDATEDATEADAT: "+date);
+			
 			String numQs=request.getParameter("numQuestions");//and here
 			String descr=request.getParameter("description");
 			
@@ -98,11 +102,31 @@ public class Make_Assignment_Servlet extends HttpServlet {
 			//same if numquestions not a number
 			//anything if deadline has already passed?.... for now same as first
 			//implement later....
-			if(checkDeadline(date))
+			System.out.println("before checks");
+			if(!checkDeadline(date))
 			{
-				
+				System.out.println("in if for checkdeadline");
+				//send to new_assignment.jsp but with error message at top
+				try{
+					request.setAttribute("CRN", crn);
+					request.setAttribute("section", course);
+					request.setAttribute("error", "The deadline you entered was not properly formatted (MM/DD/YYYY). Please try again.");
+					request.getRequestDispatcher("new_assignment.jsp").forward(request, response);
+				}catch(IOException e) { System.out.println("ioexception: "+e); }
+				catch (ServletException e) { System.out.println("servlet exception: "+e); }
 			}
-			
+			else if(!Pattern.matches("[0-9]*", numQs))
+			{
+				//send to new_assignment.jsp with error message
+				try{
+					request.setAttribute("CRN", crn);
+					request.setAttribute("section", course);
+					request.setAttribute("error", "The value you entered for number of questions was not an integer. Please try again.");
+					request.getRequestDispatcher("new_assignment.jsp").forward(request, response);
+				}catch(IOException e) { System.out.println("ioexception: "+e); }
+				catch (ServletException e) { System.out.println("servlet exception: "+e); }
+			}
+			else {
             //get last assignment id
 			//System.out.println("before max");
 			rs=queryDB("SELECT MAX(assignmentID) FROM assignments");
@@ -116,10 +140,7 @@ public class Make_Assignment_Servlet extends HttpServlet {
 			}catch(Exception e) { System.out.println("ERROR: "+e); }
 			
 			//add new assignment to the database
-			//System.out.println("before insert");
             try{
-            	//String q="INSERT INTO assignments VALUES("+aID+", "+name+", "+date+", "+descr+", "+email+", "+crn+")";
-            	//System.out.println(q);
             	sql.executeUpdate("INSERT INTO assignments VALUES("+aID+", '"+name+"', '"+date+"', '"+descr+"', '"+email+"', '"+crn+"')");
             }catch(SQLException e){ System.out.println("ERROR: "+e); }
             //System.out.println("after insert");
@@ -132,6 +153,7 @@ public class Make_Assignment_Servlet extends HttpServlet {
 				request.getRequestDispatcher("add_questions.jsp").forward(request, response);
 			}catch(IOException e) { System.out.println("ioexception: "+e); }
 			catch (ServletException e) { System.out.println("servlet exception: "+e); }
+			}
 		}
 		else if(request.getParameter("new") != null)
 		{
@@ -172,18 +194,19 @@ public class Make_Assignment_Servlet extends HttpServlet {
 				}
 			}catch(Exception e) { System.out.println("ERROR: "+e); }
 			
-			
+			System.out.println("1111111111111111111111111111111111111111111111111");
 			
 			String qs=request.getParameter("questions");
-			int id=Integer.parseInt(request.getParameter("id"));
-			System.out.println(qs+"     "+id);
+			int assignmentid=Integer.parseInt(request.getParameter("ID"));
+			System.out.println(qs+"     "+assignmentid);
 			//add the questions to the database
+			System.out.println("22222222222222222222222222222222222222222222222222222");
 			
 			for(int i=0; i<Integer.parseInt(qs); i++)
 			{
 				String prompt=(String)request.getParameter("question"+i);
 				try{
-	            	sql.executeUpdate("INSERT INTO questions VALUES("+id+", '"+prompt+"')");
+	            	sql.executeUpdate("INSERT INTO questions VALUES("+assignmentid+", '"+prompt+"')");
 	            }catch(SQLException e){ System.out.println("ERROR inserting into questions: "+e); }
 				
 				char[] answ={'a','b','c','d'};
@@ -197,14 +220,16 @@ public class Make_Assignment_Servlet extends HttpServlet {
 					}
 					
 					try{
-		            	sql.executeUpdate("INSERT INTO answers VALUES("+lastAnswerID+", '"+(String)request.getParameter("answer"+i+answ[j])+"', "+id+", '"+prompt+"', "+c+")");
+		            	sql.executeUpdate("INSERT INTO answers VALUES("+lastAnswerID+", '"+(String)request.getParameter("answer"+i+answ[j])+"', "+assignmentid+", '"+prompt+"', "+c+")");
 		            }catch(SQLException e){ System.out.println("ERROR: "+e); }
 				}
 			}
 			
+			System.out.println("333333333333333333333333333333333333333333333");
+			
 			//redirect to 
 			try{
-				request.setAttribute("id", id);
+				request.setAttribute("id", assignmentid);
 				request.getRequestDispatcher("professor_assignment_servlet_path").forward(request, response);
 			}catch(IOException e) { System.out.println("ioexception: "+e); }
 			catch (ServletException e) { System.out.println("servlet exception: "+e); }
@@ -219,7 +244,8 @@ public class Make_Assignment_Servlet extends HttpServlet {
 	 */
 	private boolean checkDeadline(String d)
 	{
-		return false;
+		//yyyy/mm/dd
+		return Pattern.matches("[0-9][0-9][0-9][0-9]/[0-9][0-9]/[0-9][0-9]", d);
 	}
 	
 	private ResultSet queryDB(String query)
