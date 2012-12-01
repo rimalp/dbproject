@@ -141,6 +141,7 @@ public class Make_Assignment_Servlet extends HttpServlet {
 			
 			//add new assignment to the database
             try{
+            	System.out.println("DATE: "+date);
             	sql.executeUpdate("INSERT INTO assignments VALUES("+aID+", '"+name+"', '"+date+"', '"+descr+"', '"+email+"', '"+crn+"')");
             }catch(SQLException e){ System.out.println("ERROR: "+e); }
             //System.out.println("after insert");
@@ -204,6 +205,9 @@ public class Make_Assignment_Servlet extends HttpServlet {
 			
 			for(int i=0; i<Integer.parseInt(qs); i++)
 			{
+				System.out.println("Question: "+(String)request.getParameter("question"+i));
+				
+				
 				String prompt=(String)request.getParameter("question"+i);
 				try{
 	            	sql.executeUpdate("INSERT INTO questions VALUES("+assignmentid+", '"+prompt+"')");
@@ -213,10 +217,15 @@ public class Make_Assignment_Servlet extends HttpServlet {
 				String[] correct=(String[])request.getParameterValues("correct");
 				for(int j=0; j<answ.length; j++)
 				{
+					System.out.println("answer: "+(String)request.getParameter("answer"+i+answ[j]));
+					
+					
 					boolean c=false;
+					if(correct != null){
 					for(int x=0; x<correct.length && c==false; x++)
 					{
 						c=(Integer.parseInt(correct[x]) == j) ? true : false;
+					}
 					}
 					
 					try{
@@ -245,7 +254,7 @@ public class Make_Assignment_Servlet extends HttpServlet {
 	private boolean checkDeadline(String d)
 	{
 		//yyyy/mm/dd
-		return Pattern.matches("[0-9][0-9][0-9][0-9]/[0-9][0-9]/[0-9][0-9]", d);
+		return Pattern.matches("[0-9][0-9][0-9][0-9]/[0-1][0-9]/[0-3][0-9]", d);
 	}
 	
 	private ResultSet queryDB(String query)

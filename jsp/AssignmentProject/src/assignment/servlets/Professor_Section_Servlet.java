@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import assignment.db.DatabaseManager;
+import java.util.Date;
 
 /**
  * Servlet implementation class Professor_Section_Servlet
@@ -63,7 +64,7 @@ public class Professor_Section_Servlet extends HttpServlet {
 			ResultSet rs = null;
 			
 			//name, descr, deadline
-			//AND to_date(deadline, 'YYYY-MM-DD') >= CURRENT_DATE for only active assigments
+			//AND to_date(deadline, 'YYYY-MM-DD') >= CURRENT_DATE for only active assigments.....::TEXT
 			String assignments = "SELECT name, description, to_date(deadline, 'YYYY-MM-DD')::TEXT, assignmentID FROM assignments, teaches WHERE assignments.CRN=teaches.CRN AND teaches.CRN='"+crn+"' AND teaches.email='"+email+"' ORDER BY deadline ASC";
 			rs = queryDB(assignments);
 			String[][] a = fillA(rs);
@@ -100,6 +101,10 @@ public class Professor_Section_Servlet extends HttpServlet {
 				r[i][0]=rs.getString(1);
 				r[i][1]=rs.getString(2);
 				r[i][2]=rs.getString(3);
+				/*r[i][2]="empty";
+				Date d=rs.getDate(3);
+				System.out.println("DATE: "+d.toString());*/
+				
 				r[i][3]=Integer.toString(rs.getInt(4));
 				
 				System.out.println("i= "+i+" "+r[i][0]+" "+r[i][1]+" date: "+r[i][2]+" "+r[i][3]);
