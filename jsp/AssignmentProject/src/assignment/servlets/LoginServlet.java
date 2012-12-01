@@ -71,6 +71,38 @@ public class LoginServlet extends HttpServlet {
 		String numStudentsQuery="SELECT CRN, COUNT(DISTINCT email) AS num FROM takes WHERE CRN IN (SELECT CRN FROM teaches WHERE email='"+username+"') GROUP BY CRN";
 		//ResultSet rs = queryDB(numStudents);
 		
+		/*String t="Select deadline from assignments order by deadline DESC LIMIT 20";
+		ResultSet temp=queryDB(t);
+		try{
+			while(temp.next())
+			{
+				System.out.println("date: "+temp.getString(1));
+			}
+		}catch(Exception e) { System.out.println("ERROROROSDGFDFG"); }
+		System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%5");
+		t="Select deadline from assignments order by deadline ASC LIMIT 20";
+		temp=queryDB(t);
+		try{
+			while(temp.next())
+			{
+				System.out.println("date: "+temp.getString(1));
+			}
+		}catch(Exception e) { System.out.println("ERROROROSDGFDFG"); }
+		
+		try{
+			sql.executeUpdate("DELETE FROM assignments WHERE deadline='datesdfs'");
+		}catch(Exception e){}
+		t="Select deadline from assignments order by deadline DESC LIMIT 20";
+		temp=queryDB(t);
+		try{
+			while(temp.next())
+			{
+				System.out.println("date: "+temp.getString(1));
+			}
+		}catch(Exception e) { System.out.println("ERROROROSDGFDFG"); }*/
+		
+		
+		
 		//for professor want course, active assignments, number of students, (crns of sections for links)
 		String countQuery = "SELECT course, COUNT(DISTINCT assignmentID), num, sections.CRN FROM ("+numStudentsQuery+") studentCount, sections, teaches, takes, assignments WHERE studentCount.CRN=teaches.CRN AND sections.CRN=teaches.CRN AND assignments.CRN=teaches.CRN AND teaches.email='"+username+"' AND to_date(deadline, 'YYYY-MM-DD') > CURRENT_DATE GROUP BY course, sections.CRN, num";
 		ResultSet assignmentCount = queryDB(countQuery);

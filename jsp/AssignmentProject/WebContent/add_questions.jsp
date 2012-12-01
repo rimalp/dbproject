@@ -69,18 +69,19 @@ Database Project
 
 <!-- jsp here to get section name -->
 
-<% String section=(String)request.getAttribute("section"); %>
+<% String section=(String)request.getAttribute("section"); 
+int qs = Integer.parseInt((String)request.getAttribute("numQs"));
+String id=(String)request.getAttribute("id"); %>
 <b class="headerfont"><% out.println(section); %>: New Assignment</b><br/><br/>
 
-<form method="post" action="make_assignment_servlet?questions=DONE">
-<% int qs = Integer.parseInt((String)request.getAttribute("numQs")); 
-for(int i=0; i<qs; i++){//assume 4 answers per question for now%>
+<form method="post" action="make_assignment_servlet?questions=<% out.println(qs); %>&id=<% out.println(id); %>">
+<% for(int i=0; i<qs; i++){//assume 4 answers per question for now%>
 <% out.println((i+1)+") "); %>Enter question: <% out.println("<input type=\"text\" name=\"question"+i+"\">"); %><br/>
 Enter up to 4 potential answers:<br/>
-1) <% out.println("<input type=\"text\" name=\"answer"+i+"a\">"); %><br/>
-2) <% out.println("<input type=\"text\" name=\"answer"+i+"b\">"); %><br/>
-3) <% out.println("<input type=\"text\" name=\"answer"+i+"c\">"); %><br/>
-4) <% out.println("<input type=\"text\" name=\"answer"+i+"d\">"); %><br/>
+a) <% out.println("<input type=\"text\" name=\"answer"+i+"a\">"); %><br/>
+b) <% out.println("<input type=\"text\" name=\"answer"+i+"b\">"); %><br/>
+c) <% out.println("<input type=\"text\" name=\"answer"+i+"c\">"); %><br/>
+d) <% out.println("<input type=\"text\" name=\"answer"+i+"d\">"); %><br/>
 Path of any images to be displayed with this problem: <input type="text"><br/>
 <br/>
 <table>

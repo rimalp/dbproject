@@ -60,7 +60,18 @@ public class Professor_Assignment_Servlet extends HttpServlet {
 		//option to add question... takes you to another page
 		System.out.println("professor assignment servlet do get");
 		
-		String assignmentID = (String)request.getParameter("id");
+		String assignmentID="";
+		if(request.getParameter("id") !=null)
+		{
+			System.out.println("do get prof assign servlet.... id in if");
+			assignmentID = (String)request.getParameter("id");
+		}
+		else if(request.getAttribute("id") != null)
+		{
+			System.out.println("do get prof assign servlet.... id in else");
+			assignmentID=(String)request.getAttribute("id");
+		}
+		
 		System.out.println("assignment id: "+assignmentID);
 		
 		//get assignment name and section name and set two parameters 

@@ -90,15 +90,23 @@ public class Make_Assignment_Servlet extends HttpServlet {
 			}catch(Exception e) { System.out.println("ERROR: "+e); }
 			
 			String name=request.getParameter("name");
-			String date=request.getParameter("deadline");
-			String numQs=request.getParameter("numQuestions");
+			String date=request.getParameter("deadline");//ADD CHECK HERE
+			String numQs=request.getParameter("numQuestions");//and here
 			String descr=request.getParameter("description");
 			
+			//if deadline not a date... send reload page with message
+			//same if numquestions not a number
+			//anything if deadline has already passed?.... for now same as first
+			//implement later....
+			if(checkDeadline(date))
+			{
+				
+			}
 			
             //get last assignment id
-			System.out.println("before max");
+			//System.out.println("before max");
 			rs=queryDB("SELECT MAX(assignmentID) FROM assignments");
-			System.out.println("after max");
+			//System.out.println("after max");
 			int aID=-1;
 			try{
 				while(rs.next())
@@ -108,18 +116,19 @@ public class Make_Assignment_Servlet extends HttpServlet {
 			}catch(Exception e) { System.out.println("ERROR: "+e); }
 			
 			//add new assignment to the database
-			System.out.println("before insert");
+			//System.out.println("before insert");
             try{
-            	String q="INSERT INTO assignments VALUES("+aID+", "+name+", "+date+", "+descr+", "+email+", "+crn+")";
-            	System.out.println(q);
+            	//String q="INSERT INTO assignments VALUES("+aID+", "+name+", "+date+", "+descr+", "+email+", "+crn+")";
+            	//System.out.println(q);
             	sql.executeUpdate("INSERT INTO assignments VALUES("+aID+", '"+name+"', '"+date+"', '"+descr+"', '"+email+"', '"+crn+"')");
             }catch(SQLException e){ System.out.println("ERROR: "+e); }
-            System.out.println("after insert");
+            //System.out.println("after insert");
 			
             //redirect to a page where questions are added
 			try{
 				request.setAttribute("section", course);
 				request.setAttribute("numQs", numQs);
+				request.setAttribute("ID", aID);
 				request.getRequestDispatcher("add_questions.jsp").forward(request, response);
 			}catch(IOException e) { System.out.println("ioexception: "+e); }
 			catch (ServletException e) { System.out.println("servlet exception: "+e); }
@@ -152,8 +161,65 @@ public class Make_Assignment_Servlet extends HttpServlet {
 			//on button click on the add questions page...
 			//add the questions to the database
 			System.out.println("QUESTIONS");
+			
+			//get last answerid
+			int lastAnswerID=-1;
+			ResultSet rs=queryDB("SELECT MAX(answerID) FROM answers");
+			try{
+				while(rs.next())
+				{
+					lastAnswerID=rs.getInt(1);
+				}
+			}catch(Exception e) { System.out.println("ERROR: "+e); }
+			
+			
+			
+			String qs=request.getParameter("questions");
+			int id=Integer.parseInt(request.getParameter("id"));
+			System.out.println(qs+"     "+id);
+			//add the questions to the database
+			
+			for(int i=0; i<Integer.parseInt(qs); i++)
+			{
+				String prompt=(String)request.getParameter("question"+i);
+				try{
+	            	sql.executeUpdate("INSERT INTO questions VALUES("+id+", '"+prompt+"')");
+	            }catch(SQLException e){ System.out.println("ERROR inserting into questions: "+e); }
+				
+				char[] answ={'a','b','c','d'};
+				String[] correct=(String[])request.getParameterValues("correct");
+				for(int j=0; j<answ.length; j++)
+				{
+					boolean c=false;
+					for(int x=0; x<correct.length && c==false; x++)
+					{
+						c=(Integer.parseInt(correct[x]) == j) ? true : false;
+					}
+					
+					try{
+		            	sql.executeUpdate("INSERT INTO answers VALUES("+lastAnswerID+", '"+(String)request.getParameter("answer"+i+answ[j])+"', "+id+", '"+prompt+"', "+c+")");
+		            }catch(SQLException e){ System.out.println("ERROR: "+e); }
+				}
+			}
+			
+			//redirect to 
+			try{
+				request.setAttribute("id", id);
+				request.getRequestDispatcher("professor_assignment_servlet_path").forward(request, response);
+			}catch(IOException e) { System.out.println("ioexception: "+e); }
+			catch (ServletException e) { System.out.println("servlet exception: "+e); }
+			
 		}
 		
+	}
+	
+	
+	/*
+	 * checks that the given deadline is a date
+	 */
+	private boolean checkDeadline(String d)
+	{
+		return false;
 	}
 	
 	private ResultSet queryDB(String query)
