@@ -69,12 +69,28 @@ public class Professor_Section_Servlet extends HttpServlet {
 			rs = queryDB(assignments);
 			String[][] a = fillA(rs);
 			
+			//students
+			rs=queryDB("SELECT first_name, last_name, email FROM users WHERE email IN (SELECT takes.email FROM takes WHERE takes.crn='"+crn+"')");
+			String[][] students=new String[50][3];
+			try{
+				int p=0;
+				while(rs.next())
+				{
+					students[p][0]=rs.getString(1);
+					students[p][1]=rs.getString(2);
+					students[p][2]=rs.getString(3);
+					System.out.println("Student: "+students[p][0]+" "+students[p][1]+" email: "+students[p][2]);
+					p++;
+				}
+			}catch(Exception e){ System.out.println("ERROR: "+e); }
+			
 			//title, room, days, time
 			String sectionInfo = "SELECT course, room, day, time FROM sections, teaches WHERE sections.CRN='"+crn+"' AND teaches.CRN=sections.CRN AND teaches.email='"+email+"'";
 			rs=queryDB(sectionInfo);
 			String[] info = fillInfo(rs);
 			
 			try{
+				request.setAttribute("students", students);
 				request.setAttribute("CRN", crn);
 				request.setAttribute("assignments", a);
 				request.setAttribute("info", info);

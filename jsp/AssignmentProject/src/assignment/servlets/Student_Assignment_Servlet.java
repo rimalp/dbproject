@@ -101,6 +101,7 @@ public class Student_Assignment_Servlet extends HttpServlet {
 			String[] answersGiven=fillAnswers(rs);
 			
 			try{
+				request.setAttribute("assignmentID", assignmentID);
 				request.setAttribute("section", section);
 				request.setAttribute("assignment", assignment);
 				request.setAttribute("questions", q);
@@ -151,6 +152,9 @@ public class Student_Assignment_Servlet extends HttpServlet {
 		// TODO Auto-generated method stub
 		System.out.println("dopost assignment servlet");
 		
+		HttpSession session = request.getSession();
+		String email = (String) session.getAttribute("currentEmail");
+		
 		if(request.getParameter("Save") != null)
 		{
 			int i=0;
@@ -163,17 +167,91 @@ public class Student_Assignment_Servlet extends HttpServlet {
 				}catch(Exception e) { System.out.println("ERROR: "+e); }
 				i++;
 			}
-			
-			
-			
 			//save checked answers
 			//show same page with with "SAVED" written at top
 			//same as doget??
 		}
 		else if(request.getParameter("Submit") != null)
 		{
-			//save answers
+			//save answers.... later, just grade
 			//show grade with same page and correct answers
+			System.out.println("student assignment servlet do post submit");
+			
+			int assignmentID=Integer.parseInt(request.getParameter("assignmentID"));
+			System.out.println("assignment id= "+assignmentID);
+			
+			//get a list of answers in the same order as they are presented
+			String query="SELECT questions.prompt, content, correct, answerID FROM questions, answers WHERE correct=true AND questions.prompt=answers.prompt AND answers.assignmentID=questions.assignmentID AND answers.assignmentID="+assignmentID+" ORDER BY questions.prompt";
+			ResultSet rs= queryDB(query);
+			
+			String[][] q = questionArray(rs);
+			int numQuestions;
+			for(numQuestions=0; numQuestions<q.length && q[numQuestions][0]!=null; numQuestions++){}
+			
+			//get student response in order
+			int n=0;//selected answer to question n
+			int correct=0;
+			while((String)request.getParameter("answer"+n) != null)
+			{
+				String answer=(String)request.getParameter("answer"+n);
+				System.out.println("given: "+answer+" current: "+q[n][1]+" correct: "+q[n][2]);
+				if(answer.equals(q[n][2]) && q[n][2].equals("true"))
+				{
+					correct++;
+				}
+				n++;
+			}
+			System.out.println("CORRECT: "+correct+" TOTAL: "+numQuestions);
+			
+			//check if deadline passed...
+			//get deadline
+			boolean saveAnswers=false;
+			ResultSet deadline=queryDB("SELECT deadline FROM assignments WHERE assignmentID="+assignmentID+" AND to_date(deadline, 'YYYY-MM-DD') > CURRENT_DATE");
+			try{
+				if(deadline.next())
+				{
+					saveAnswers=true;
+				}
+			}catch(Exception e){ System.out.println("ERROR: "+e); }
+			
+			//add score to assigned table
+			//check if already submitted a score	
+			String pastDeadline="";
+			if(saveAnswers)
+			{
+				ResultSet lastScore=queryDB("SELECT grade FROM assigned WHERE assignmentID='"+assignmentID+"' AND email='"+email+"'");
+				try{
+					if(lastScore.next()){
+						lastScore.getDouble(1);
+						System.out.println(sql.executeUpdate("UPDATE assigned SET submit_time=CURRENT_TIMESTAMP, score="+(correct/numQuestions)+" WHERE assignmentID='"+assignmentID+"' AND email='"+email+"'"));
+					}
+					else{
+						System.out.println("inserted....  "+sql.executeUpdate("INSERT INTO assigned VALUES("+assignmentID+", '"+email+"', "+(correct/numQuestions)+", CURRENT_TIMESTAMP)"));
+					}
+				}catch(Exception e){ System.out.println("ERROR: "+e); }
+			}
+			else
+			{
+				pastDeadline="The deadline for this assignment has passed.";
+			}
+			
+			//what page to go to? then display ratio correct/numQuestions and save to assigned table
+			//get assignment name
+			ResultSet assignment=queryDB("SELECT name FROM assignments WHERE assignmentID="+assignmentID);
+			String assignmentName="";
+			try{
+				assignment.next();
+				assignmentName=assignment.getString(1);
+			}catch(Exception e){ System.out.println("ERROR: "+e); }
+			try{
+				request.setAttribute("assignment", assignmentName);
+				request.setAttribute("total", numQuestions);
+				request.setAttribute("correct", correct);
+				request.setAttribute("deadline", pastDeadline);
+				request.getRequestDispatcher("show_score.jsp").forward(request, response);
+			}catch(IOException e) { System.out.println("ioexception: "+e); }
+			catch (ServletException e) { System.out.println("servlet exception: "+e); }
+			
 		}
 		else
 		{

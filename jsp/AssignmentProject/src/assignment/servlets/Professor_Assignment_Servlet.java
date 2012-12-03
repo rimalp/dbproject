@@ -64,12 +64,22 @@ public class Professor_Assignment_Servlet extends HttpServlet {
 		if(request.getParameter("id") !=null)
 		{
 			System.out.println("do get prof assign servlet.... id in if");
-			assignmentID = Integer.parseInt((String)request.getParameter("id"));
+			assignmentID = Integer.parseInt(request.getParameter("id"));
 		}
 		else if(request.getAttribute("id") != null)
 		{
 			System.out.println("do get prof assign servlet.... id in else");
 			assignmentID=(Integer)request.getAttribute("id");
+		}
+		/*else if(request.getParameter("ID") != null)
+		{
+			System.out.println("do get with ID");
+			assignmentID=Integer.parseInt((String)request.getParameter("ID"));
+		}*/
+		else if(request.getAttribute("editID") !=null)
+		{
+			System.out.println("prof assignment servlet doget... editid: "+request.getAttribute("editID"));
+			assignmentID=(Integer)request.getAttribute("editID");
 		}
 		
 		System.out.println("assignment id: "+assignmentID);
@@ -96,6 +106,8 @@ public class Professor_Assignment_Servlet extends HttpServlet {
 		HttpSession session = request.getSession();
 		String email = (String) session.getAttribute("currentEmail");
 		
+		//System.out.println("professor assignment servlet... befoer if aid=-1");
+		
 		if(assignmentID != -1)
 		{
 			//get all questions
@@ -105,11 +117,17 @@ public class Professor_Assignment_Servlet extends HttpServlet {
 			
 			String[][] q = questionArray(rs);
 			
-			
+			//System.out.println("professor assignment servlet.... before forward");
+			//System.out.println("section: "+section+" assignment: "+assignment+" questions(first): "+q[0][0]+" aid: "+assignmentID);
 			try{
 				request.setAttribute("section", section);
+				//System.out.println("1111111111111111");
 				request.setAttribute("assignment", assignment);
+				//System.out.println("22222222222222222222222222");
 				request.setAttribute("questions", q);
+				//System.out.println("33333333333333333333");
+				request.setAttribute("assignmentID", assignmentID);
+				//System.out.println("444444444444444444");
 				request.getRequestDispatcher("professor_view_assignment.jsp").forward(request, response);
 			}catch(IOException e) { System.out.println("ioexception: "+e); }
 			catch (ServletException e) { System.out.println("servlet exception: "+e); }
@@ -127,21 +145,54 @@ public class Professor_Assignment_Servlet extends HttpServlet {
 		System.out.println("DOPOST prof assignment servlet");
 		String edit=request.getParameter("Edit");
 		
+		if(request.getParameter("ID") != null)
+		{
+			System.out.println(request.getParameter("ID")+"=ID after edit... send to do get and populate view assignment page");
+			
+			doGet(request, response);
+		}
+		else if((Integer)request.getAttribute("editID") != null)
+		{
+			//assignmentid=(Integer)request.getAttribute("editID");
+			System.out.println("editID in prof assignment servlet... go to doget..."+(Integer)request.getAttribute("editID"));
+			doGet(request,response);
+		}
+		
 		int assignmentid=-1;
 		if((Integer)request.getAttribute("id") != null){ 
 			assignmentid=(Integer)request.getAttribute("id"); 
-//			doGet(request, response);
+			System.out.println("go to doget????"+assignmentid);
+			//if(edit == null){ doGet(request, response); }
 		}
+		
+		if(request.getParameter("assignmentID") != null)
+		{
+			assignmentid=Integer.parseInt(request.getParameter("assignmentID"));
+		}
+		
+		System.out.println("assignment id after get parameter: "+assignmentid);
+		
 		System.out.println(assignmentid);
 		
-		if(edit != null)
+		if(edit != null && assignmentid !=-1 && request.getParameter("DELETE") == null)
 		{
+			System.out.println("edit not null and assignmentid not -1");
 			//get same info then redirect to an assignment editing page
 			String assignmentEditQ="SELECT questions.prompt, content, correct FROM questions, answers WHERE questions.prompt=answers.prompt AND questions.assignmentID=answers.assignmentID AND questions.assignmentID="+assignmentid + " ORDER BY questions.prompt";
 			ResultSet editRS = queryDB(assignmentEditQ);
-			if(editRS == null) System.err.println("editRS is NULLLLLLLLLLLLLLLLLLLL");
+			//if(editRS == null) System.err.println("editRS is NULLLLLLLLLLLLLLLLLLLL");
 			String[][] result = questionsEditArray(editRS);
-					
+			
+			
+			//TESTSETSETSETSET
+			//print result array
+			for(int i=0; i<result.length && result[i][0]!=null; i++)
+			{
+				System.out.println("q: "+result[i][0]+" a: "+result[i][1]+" correct: "+result[i][2]+" i: "+i);
+			}
+			
+			
+			
 			//redirect to the edit jsp page
 			//get the attributes from db
 			String sectionQ="SELECT course FROM assignments, sections WHERE assignmentID='"+assignmentid+"' AND assignments.CRN=sections.CRN";
@@ -149,15 +200,17 @@ public class Professor_Assignment_Servlet extends HttpServlet {
 			ResultSet n=queryDB(sectionQ);
 			String section="";
 			try{
-				n.next();
-				section=n.getString(1);
+				if(n.next()){
+				section=n.getString(1);}
+				else{System.out.println("section query null?"); }
 			}catch(Exception e){ System.out.println("ERROR: "+e); }
 			
 			n=queryDB(assignmentQ);
 			String assignment="";
 			try{
-				n.next();
-				assignment=n.getString(1);
+				if(n.next()){
+				assignment=n.getString(1);}
+				else{System.out.println("assignment query null???"); }
 			}catch(Exception e){ System.out.println("ERROR: "+e); }
 			
 			try{
@@ -165,14 +218,28 @@ public class Professor_Assignment_Servlet extends HttpServlet {
 				request.setAttribute("assignment", assignment);
 				request.setAttribute("questions", result);
 				request.setAttribute("ID", assignmentid);
-				request.setAttribute("numQs", new String(""+result.length/4));
+				//request.setAttribute("numQs", ""+result.length/4);
 				request.getRequestDispatcher("edit_assignment.jsp").forward(request, response);
 			}catch(IOException e) { System.out.println("ioexception: "+e); }
 			catch (ServletException e) { System.out.println("servlet exception: "+e); }			
 		}
+		else if(request.getParameter("DELETE") != null)
+		{
+			System.out.println("DLETETETETETETE ing else if");
+			try{
+				System.out.println(sql.executeUpdate("DELETE FROM assignments WHERE assignmentID="+assignmentid));
+			}catch(SQLException e){ System.out.println("ERROR deleting assignment: "+e); }
+			
+			//go to assignments page
+			try{
+//				request.getRequestDispatcher("loginpath?id=professor_home_link").forward(request, response);
+				response.sendRedirect("loginpath?id=professor_home_link");
+			}catch(IOException e) { System.out.println("ioexception: "+e); }
+		
+		}
 		else
 		{
-			request.getRequestDispatcher("professor_welcome.jsp").forward(request, response);
+			System.out.println("ELSE IN PROFESSOR ASSIGNMENT SERVLET DOPOST");
 		}
 
 	}
@@ -206,7 +273,7 @@ public class Professor_Assignment_Servlet extends HttpServlet {
 				r[i][2]=String.valueOf(rs.getBoolean(3));
 				r[i][3]=Integer.toString(rs.getInt(4));
 				i++;
-				System.err.println("i="+i+"     "+a+" "+r[i][1]+" "+r[i][2]+" "+r[i][3]);
+				//System.err.println("i="+i+"     "+a+" "+r[i][1]+" "+r[i][2]+" "+r[i][3]);
 			}
 		}catch(SQLException e) { System.out.println("SQLEXCEPTION: "+e); }
 		return r;

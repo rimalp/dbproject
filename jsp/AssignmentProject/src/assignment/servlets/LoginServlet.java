@@ -69,37 +69,6 @@ public class LoginServlet extends HttpServlet {
 	private void displayProfessorHome(String username, HttpServletRequest request, HttpServletResponse response)
 	{
 		String numStudentsQuery="SELECT CRN, COUNT(DISTINCT email) AS num FROM takes WHERE CRN IN (SELECT CRN FROM teaches WHERE email='"+username+"') GROUP BY CRN";
-		//ResultSet rs = queryDB(numStudents);
-		
-		/*String t="Select deadline from assignments order by deadline DESC LIMIT 20";
-		ResultSet temp=queryDB(t);
-		try{
-			while(temp.next())
-			{
-				System.out.println("date: "+temp.getString(1));
-			}
-		}catch(Exception e) { System.out.println("ERROROROSDGFDFG"); }
-		System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%5");
-		t="Select deadline from assignments order by deadline ASC LIMIT 20";
-		temp=queryDB(t);
-		try{
-			while(temp.next())
-			{
-				System.out.println("date: "+temp.getString(1));
-			}
-		}catch(Exception e) { System.out.println("ERROROROSDGFDFG"); }
-		
-		try{
-			sql.executeUpdate("DELETE FROM assignments WHERE deadline='fakeDate'");
-		}catch(Exception e){}
-		t="Select deadline from assignments order by deadline DESC LIMIT 20";
-		temp=queryDB(t);
-		try{
-			while(temp.next())
-			{
-				System.out.println("date: "+temp.getString(1));
-			}
-		}catch(Exception e) { System.out.println("ERROROROSDGFDFG"); }*/
 		
 		
 		

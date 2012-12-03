@@ -3,6 +3,7 @@
 <% String[][] questions= (String[][])request.getAttribute("questions");
 String assignment=(String)request.getAttribute("assignment");
 String section = (String)request.getAttribute("section");
+int assignmentid=(Integer)request.getAttribute("assignmentID");
 %>
 <head>
 <title>
@@ -70,8 +71,8 @@ Database Project
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 <b class="headerfont"><% out.println(section+": "+assignment); %></b><br/><br/>
 
-<% for(int i=0; i<questions.length; i++){
-	if(questions[i][0] != null){%>
+<% int i;
+for(i=0; i<questions.length && questions[i][0] != null; i++){%>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 <p><% out.println(questions[i][0]); %></p>
 <form>
@@ -79,7 +80,7 @@ Database Project
 //if questions null, download link?
 while(i<questions.length && questions[i][0].equals(questions[i+1][0])) {
 %>
-<%
+<% //System.out.println("while loop i="+i+" question: "+questions[i][0]);
 out.println(num+") "+questions[i][1]);
 %>
 <br/>
@@ -95,13 +96,19 @@ out.println(num+") "+questions[i][1]);
 </form>
 <%
 }
-}%>
+//System.out.println("AFTER LOOPS");%>
 
-<form method="post" action="professor_assignment_servlet_path">
+<% if(i>0){%>
+<form method="post" action="professor_assignment_servlet_path?assignmentID=<% out.println(assignmentid);%>">
 <input type="Submit" name="Edit" value="Edit">
 </form>
+<%} 
+else{%>
+<form method="post" action="professor_assignment_servlet_path?assignmentID=<% out.println(assignmentid);%>&DELETE=true">
+<input type="Submit" name="Edit" value="Delete Assignment">
+</form>
+<%} %>
 <!-- edit button for professors -->
-
 
 <table border="0" cellspacing="0" cellpadding="2" width="100%">
 <tr style="height: 5px">

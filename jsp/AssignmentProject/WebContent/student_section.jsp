@@ -92,6 +92,18 @@ if(assignments[i][0] != null){%>
 
 <br/>
 
+<tr>
+<td>Assigment Name </td>
+<td>&nbsp;&nbsp;&nbsp;&nbsp;Grade(%) </td>
+</tr>
+<%String[][] grades = (String[][])request.getAttribute("assignments_grades"); %>
+<%for(int r=0; r<grades.length && grades[r][0] != null; r++) { %>
+<tr>
+<td><%out.print(grades[r][0]); %></td>
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<%out.print(Double.parseDouble(grades[r][1])*100+"%"); %> </td>
+</tr>
+<%} %>
+
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 <b class="bigbigfont">Section Information:</b><br/><!-- course title, time, day, room -->
 <table border="0" cellpadding="0" cellspacing="9" width="100%" class="normalfont">

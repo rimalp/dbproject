@@ -1,7 +1,8 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
-<% String[] info = (String[])request.getAttribute("info"); %>
+<% String[] info = (String[])request.getAttribute("info"); 
+String[][] students=(String[][])request.getAttribute("students");%>
 <title>
 <% out.println(info[0]); %>
 </title>
@@ -103,6 +104,20 @@ if(assignments[i][0] != null){%>
 <%-- <% out.println("<a href=\"make_assignment_servlet?new="+request.getAttribute("CRN")+"\">Add Assignment</a>"); --%>
 <br/>
 <br/>
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<b class="bigbigfont">Students:</b><br/><!-- course title, time, day, room -->
+
+<!-- name, email.... click on name to see scores on assignments -->
+<% for(int i=0; i<students.length && students[i][0] != null; i++){ %>
+<% out.println("<a href=\"student_grades_servlet?email="+students[i][2]+"&crn="+(String)request.getParameter("CRN")+"\">"+students[i][0]+" "+students[i][1]+"</a> ("+students[i][2]+")"); %><br/>
+<%} %>
+<br/>
+<br/>
+
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 <b class="bigbigfont">Section Information:</b><br/><!-- course title, time, day, room -->

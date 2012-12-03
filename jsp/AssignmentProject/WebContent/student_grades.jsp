@@ -1,9 +1,10 @@
-
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
+<% String[][] grades = (String[][])request.getAttribute("grades");
+%>
 <title>
-Section 1
+Grades
 </title>
 <style type="text/css">
 <!--
@@ -41,10 +42,7 @@ button, button:focus, button:active {
 <td style="width: 190px;" class="marginbackground">
 
 
-
-
 <%@ include file="professor_left_links.jsp" %>
-
 
 
 </td>
@@ -66,45 +64,34 @@ Database Project
 </table></CENTER>
 <hr/>
 
-
-<!-- jsp here to get section name -->
-
-<% String section=(String)request.getAttribute("section"); 
-String[][] questions = (String[][])request.getAttribute("questions");
-//int qs = Integer.parseInt((String)request.getAttribute("numQs"));
-int id=((Integer)request.getAttribute("ID")).intValue(); 
-%>
-<b class="headerfont"><% out.println(section); %>: New Assignment</b><br/><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<b class="headerfont"><% //out.println(info[0]); %></b><br/><br/>
 
 
-<!-- "make_assignment_servlet?ID=<% out.println(id); %> -->
-<form method="post" action="make_assignment_servlet?ID=<% out.println(id); %>&numQuestions=<% out.println(questions.length); %>">
-<% int i; 
-for(i=0; i<questions.length && questions[i][0]!=null; i+=4){//assume 4 answers per question for now%>
-<% out.println((i+1)+") "); %>Enter question: <% out.println("<input type=\"text\" value=\"" +questions[i][0]+"\" name=\"question"+i+"\">"); %><input type="checkbox" name="delete" value="<% out.println(questions[i][0]); %>"><br/>
-Enter up to 4 potential answers:<br/>
-a) <% out.println("<input type=\"text\"  value=\"" +questions[i][1]+"\"name=\"answer"+i+"a\">"); %><br/>
-b) <% out.println("<input type=\"text\"  value=\"" +questions[i+1][1]+"\"name=\"answer"+i+"b\">"); %><br/>
-c) <% out.println("<input type=\"text\"  value=\"" +questions[i+2][1]+"\"name=\"answer"+i+"c\">"); %><br/>
-d) <% out.println("<input type=\"text\"  value=\"" +questions[i+3][1]+"\"name=\"answer"+i+"d\">"); %><br/>
-Path of any images to be displayed with this problem: <input type="text"><br/>
-<br/>
 <table>
 <tr>
-<td>Mark any correct answers:</td>
-<td>a)<input type="checkbox" name="correct" <%if(questions[i][2].equals("true")) out.println("checked=\"checked\""); %> value="1"></td>
-<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;b)<input type="checkbox" name="correct" <%if(questions[i+1][2].equals("true")) out.println("checked=\"checked\""); %> value="2"></td>
+<td class="centertable">
+Assignment Name
+</td>
+<td class="centertable">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Score
+</td>
 </tr>
+<% for(int i=0; i<grades.length && grades[i][0] != null; i++){ %>
 <tr>
-<td></td>
-<td>c)<input type="checkbox" name="correct"  <%if(questions[i+2][2].equals("true")) out.println("checked=\"checked\""); %> value="3"></td>
-<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;d)<input type="checkbox" name="correct"  <%if(questions[i+3][2].equals("true")) out.println("checked=\"checked\""); %> value="4"></td>
+<td class="centertable normalfont">
+<% out.println(grades[i][1]);%>
+</td>
+<td class="centertable normalfont">
+<% out.println(grades[i][0]); %>
+</td>
 </tr>
-</table>
-<br/>
 <%} %>
-<input type="Submit" name="done" <% if(i==0) out.println("disabled"); %> value="Save Assignment">
-</form>
+</table>
+
+
+
 
 
 

@@ -79,7 +79,13 @@ public class Student_Section_Servlet extends HttpServlet {
 			rs=queryDB(sectionInfo);
 			String[] info = fillInfo(rs);
 			
+			//get the grades for this course
+			String courseGradeQ = "SELECT assignments.name, grade FROM assignments, assigned WHERE assigned.assignmentid=assignments.assignmentid AND assignments.crn='"+crn+"' AND assigned.email='"+email+"'";
+			ResultSet gradeRS = queryDB(courseGradeQ);
+			String[][] grades = getGrades(gradeRS);
+			System.out.println("Gradessssssssssssss-------- " + grades[0][0] + "  " + grades[0][1] );
 			try{
+				request.setAttribute("assignments_grades", grades);
 				request.setAttribute("assignments", a);
 				request.setAttribute("info", info);
 				request.getRequestDispatcher("student_section.jsp").forward(request, response);
@@ -89,7 +95,23 @@ public class Student_Section_Servlet extends HttpServlet {
 		}
 		//also sort link options delt with here
 	}
-
+	
+	//read and return assignment name and grades from result set and return it in an array
+	private String[][] getGrades(ResultSet rs){
+		String[][] result = new String[100][2];
+		
+		try {
+			int i = 0;
+			while(rs.next()){
+				result[i][0] = (String)rs.getString(1);
+				result[i++][1] = "" +(Double)rs.getDouble(2);
+			}
+		}catch(Exception e){ System.out.println("ERROR: " + e); }
+		
+		return result;
+	}
+	
+	
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */

@@ -109,4 +109,14 @@
     <servlet-name>Make_Assignment_Servlet</servlet-name>
     <url-pattern>/make_assignment_servlet</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>Student_Grades_Servlet</display-name>
+    <servlet-name>Student_Grades_Servlet</servlet-name>
+    <servlet-class>assignment.servlets.Student_Grades_Servlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>Student_Grades_Servlet</servlet-name>
+    <url-pattern>/student_grades_servlet</url-pattern>
+  </servlet-mapping>
 </web-app>
