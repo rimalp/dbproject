@@ -1,12 +1,8 @@
-change titles for all pages
-for assignments with no questions, display link to some page to print (???)
 
-get links working for professor side
 ...
 
-triggers and indexing
-new table... answer history for students ????
-only 1 student has completed each assignment in assigned table... refill and fix function??? :
+triggers
+
 
 def populateTeachesAssignmentsTakesAndAssigned(sections, professors, students, cur):
  r = []
@@ -71,11 +67,35 @@ def populateTeachesAssignmentsTakesAndAssigned(sections, professors, students, c
 
 
 
+################################################################33
+#create new table... lastSubmission
+
+cur.execute("CREATE TABLE last_submission(\
+               email	VARCHAR(50) PRIMARY,\
+               assignmentID	INT,\
+               prompt	TEXT,\
+               answerID	INT,\
+               PRIMARY KEY(email, assignmentID, prompt))")
+
+def populateLastSubmission(cur):
+  #lets not populate it with fake data
+
+
+
+
+
+
 TRIGGERS
 
 CREATE TRIGGER AddUserStudent
   AFTER INSERT ON students
   FOR EACH ROW
+  EXECUTE PROCEDURE add_students()
+
+CREATE FUNCTION add_students() RETURNS trigger AS $add_student$
+  BEGIN
+    --
+
   WHEN (NEW.email NOT IN
     (SELECT email FROM users))
   ####weird procedure thing
