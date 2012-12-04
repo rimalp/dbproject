@@ -2,7 +2,7 @@
 <html>
 <%@ page import="java.util.ArrayList, java.util.Arrays" %>
 <% String[][] questions= (String[][])request.getAttribute("questions");
-//String[][] prevAnswers=(String[][])request.getAttribute("answersGiven");
+/* ArrayList<String> prevAnswers=new ArrayList(Arrays.asList((String[])request.getAttribute("answersGiven")));*/
 String assignment=(String)request.getAttribute("assignment");
 String section = (String)request.getAttribute("section");
 int assignmentID=Integer.parseInt((String)request.getAttribute("assignmentID"));
@@ -11,6 +11,10 @@ int assignmentID=Integer.parseInt((String)request.getAttribute("assignmentID"));
 <title>
 <% out.println(assignment); %>
 </title>
+
+<link type="text/css" rel="stylesheet" href="css/bootstrap.css" />
+<link type="text/css" rel="stylesheet" href="css/bootstrap-responsive.css" />
+
 <style type="text/css">
 <!--
 .normalfont {font-size: 11pt; font-family: "Geneva, Arial, Helvetica, sans-serif";}
@@ -22,27 +26,105 @@ int assignmentID=Integer.parseInt((String)request.getAttribute("assignmentID"));
 .centertable {text-align: center; vertical-align: middle;}
 a {text-decoration: none;}
 .headerfont {font-size: 18pt; font-family: "Geneva, Arial, Helvetica, sans-serif";}
-button, button:focus, button:active {
-    /* NOTE Remove all decorations */
-    border: none;
-    display: inline;
-    margin: 0em;
-    padding: 0em;
-    outline: none;
-    outline-offset: 0em;
-    /* NOTE Look like a link */
-    background: none;
-    color: blue;
-    cursor: pointer;
-    font: inherit;
-    text-decoration: none;
-}
--->
 </style>
 </head>
-<!-- bgcolor="aqua" -->
 <body class="bodybackground" style="margin-top: 0; margin-left: 0; margin-bottom: 4px; margin-right: 4px">
-<table border="0" cellpadding="0" cellspacing="0" width="875px" style="height: 100%">
+
+
+<div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+      <div class="container">
+        <p class="brand" align="left">The Assignment Project</p>
+        <div class="nav-collapse">
+           <p align="right"> Signed in as <% String e = (String)request.getSession().getAttribute("name"); out.println(e); %></p>
+           <p class="text-info" align="right">
+           <a class="text-info" href="loginpath?id=logout_link">Logout</a>
+           </p>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  
+  <div class="container-fluid span15">
+
+	<div class="row-fluid">
+		<div class="span2">
+			<%@ include file="student_left_links.jsp"%>
+		</div>
+			<div class="span10" style="padding-top: 72px; border: 2px; border-left-style: solid; border-color: #3399FF; margin: 10px; height: 100%; overflow:auto">
+				<table>					
+						<tr valign="middle">						
+						<td valign="middle" class="lightbackgroundwithnormalfont" style="width:100%;">
+						<table border="0" cellspacing="0" cellpadding="0" width="100%" class="smallfont" style="color: black;">
+							<tr class="darkbackgroundwithhugefont" style="height: 35px">
+								<td valign="middle" align="center">
+								<p class="text-info" align="center">
+								<b>							
+								<% out.println(section+": "+assignment); %><br/><br/>
+								</b>
+								</p>
+								</td>
+							</tr>
+						</table>
+						
+						</td>
+						</tr>
+				</table>
+				<br><br>
+
+				<form class="well" method="post" action="student_assignment_servlet_path?assignmentID=<% out.println(assignmentID); 
+					int q=0;
+					%>">
+					
+					<% for(int i=0; i<questions.length && questions[i][0] != null; i++){
+						if(questions[i][0] != null){%>
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+					<ol class="text-info" start="<%out.print(i/4+1);%>">
+					<li><p class="text-info"><% out.println(questions[i][0]); %></p></li>
+					</ol>
+					<% int num=1;
+					//if questions null, download link?
+					while(i<questions.length && questions[i][0].equals(questions[i+1][0])) {%>
+					<% String c="";
+					//if student has selected this answer before, check the box
+					//if(prevAnswers.contains(questions[i][3])){ c="checked"; }
+					out.println("<label class=\"radio\">");
+					out.println("<input class=\"radio\" type=\"radio\" name=\"answer"+q+"\" value=\""+questions[i][2]+"\" "+c+">"+questions[i][1]); 
+					out.println("</label>");
+					
+					%><br/>
+					
+					<% num++;
+					i++;
+					}
+					%>
+					<%
+					out.println("<label class=\"radio\">");
+					out.println("<input type=\"radio\" name=\"answer"+q+"\" value=\""+questions[i][2]+"\">"+questions[i][1]);
+					out.println("</label>");
+					
+					q++;
+					}%>
+					<br>
+					<br>
+					<% } %>
+					<br/>
+					<input class="btn btn-primary" type="Submit" name="Submit" value="Submit">
+				</form>				
+									
+			
+	
+	
+			
+									
+			</div>
+		</div>
+</div>
+
+
+
+<%-- <table border="0" cellpadding="0" cellspacing="0" width="875px" style="height: 100%">
 <tr valign="top">
 <td style="width: 190px;" class="marginbackground">
 
@@ -122,6 +204,9 @@ when submited, update the assigned table in the db -->
 &nbsp;
 </td>
 </tr>
-</table>
+</table> --%>
+
+
+
 </body>
 </html>

@@ -1,47 +1,49 @@
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
-    pageEncoding="ISO-8859-1"%>
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-	<title>Insert title here</title>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Insert title here</title>
+<link type="text/css" rel="stylesheet" href="css/bootstrap.css" />
+<link type="text/css" rel="stylesheet"
+	href="css/bootstrap-responsive.css" />
 
-	<style>
-	
-	</style>
 
 </head>
 <body>
-<form method="post" action="loginpath">
-  Username: <input type="text" name="username" size="15" /><br />
-  Password: <input type="password" name="password" size="15" /><br />
-  <div align="left">
-    <input type="submit" name = "login" value="Login" />
-    <input type="submit" name = "cancel" value="Cancel" /> 
-  </div>
-</form>
 
-<!-- begin test portion -->
-<br/>
-<br/>
-<form method="post" action="loginpath">
-  <input type="submit" name="show" value="Show First 5 Users" />
-</form>
-<br/>
-<form method="post" action="loginpath">
-  <input type="submit" name="insert" value="Temp Insert" />
-</form>
-<!--
-<br/>
-<br/>
-<form method="post" action="loginpath">
-  Email: <input type="text" name="email" size="15" /><br/>
-  New Email: <input type="text" name="newEmail" size="15" /><br/>
-  New Password: <input type="text" name="newPass" /><br/>
-  <input type="submit" name = "change" value="Update Password" />
-</form>
--->
-<!-- end test portion -->
+
+	<div class="container-fluid">
+		<div class="row-fluid">
+			<div class="span2">
+				<form method="post" action="loginpath">
+					<input type="submit" name="show" value="Show First 5 Users" />
+				</form>
+			</div>
+			<div class="span10">
+				<div class="modal" align="center">
+
+					<form class="well" method="post" action="loginpath">
+						<h3 class="text-info">Login to Online Assignments</h3>
+						Username: <input class="span4" type="text" name="username" /><br />
+						Password: <input class="span4" type="password" name="password" /><br />
+						<input class="btn btn-primary" type="submit" name="login"
+							value="Login" /> <input class="btn btn-primary" type="submit"
+							name="cancel" value="Cancel" />
+
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+
+	begin test portion
+	<br />
+	<br />
+
+
+
 
 </body>
 </html>
