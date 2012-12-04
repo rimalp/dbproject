@@ -1,12 +1,8 @@
-change titles for all pages
-for assignments with no questions, display link to some page to print (???)
 
-get links working for professor side
 ...
 
-triggers and indexing
-new table... answer history for students ????
-only 1 student has completed each assignment in assigned table... refill and fix function??? :
+triggers
+
 
 def populateTeachesAssignmentsTakesAndAssigned(sections, professors, students, cur):
  r = []
@@ -71,14 +67,59 @@ def populateTeachesAssignmentsTakesAndAssigned(sections, professors, students, c
 
 
 
+################################################################33
+#create new table... lastSubmission
+
+cur.execute("CREATE TABLE last_submission(\
+               email	VARCHAR(50) PRIMARY,\
+               assignmentID	INT,\
+               prompt	TEXT,\
+               answerID	INT,\
+               PRIMARY KEY(email, assignmentID, prompt))")
+
+def populateLastSubmission(cur):
+  #lets not populate it with fake data
+
+
+
+
+
+
 TRIGGERS
+TEST to see if they work (just these two)
+the procedure definition must come before the create trigger....
+remember to drop triggers each time we repopulate the database
+###########################################33
+CREATE OR REPLACE FUNCTION add_students() RETURNS trigger AS $add_student$
+  BEGIN
+    IF(TG_OP = 'INSERT') THEN
+      INSERT INTO users(email) VALUES(newUser.email);
+    END IF;
+    RETURN NEW;
+  END;
+$add_student$ LANGUAGE plpgsql
 
 CREATE TRIGGER AddUserStudent
   AFTER INSERT ON students
   FOR EACH ROW
-  WHEN (NEW.email NOT IN
-    (SELECT email FROM users))
-  ####weird procedure thing
+  EXECUTE PROCEDURE add_students()
+##################################################
+
+CREATE OR REPLACE FUNCTION add_professors() RETURNS trigger AS $add_professor$
+  BEGIN
+    IF(TG_OP = 'INSERT') THEN
+      INSERT INTO users(email) VALUES(newUser.email);
+    END IF;
+    RETURN NEW;
+  END;
+$add_professor$ LANGUAGE plpgsql
+
+CREATE TRIGGER AddUserProfessor
+  AFTER INSERT ON professors
+  FOR EACH ROW
+  EXECUTE PROCEDURE add_professors()
+##############################################
+
 
 
  #this inserts a user after you insert a new student because a student is a user.

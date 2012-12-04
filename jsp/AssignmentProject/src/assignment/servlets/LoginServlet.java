@@ -161,6 +161,7 @@ public class LoginServlet extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
+		///////////////////////////////////////////////////
 		System.out.println("The SQL object: " + sql);
 
 		response.setContentType("text/html");
@@ -276,6 +277,47 @@ public class LoginServlet extends HttpServlet {
 			}catch(SQLException e){ System.out.println("SQLException on update: "+e); }
 		}*/
 		//End test portion//
+		else if(request.getParameter("insert") != null)
+		{
+			//run this once to add a class for rimal james to take and wilson james to teach wih assignments etc.
+			//WARNING... this data already inserted once...
+			boolean inserted=true;
+			if(!inserted){
+				try{
+					System.out.println("inserting test values into database");
+					int check=-1;
+					check=sql.executeUpdate("INSERT INTO sections VALUES('CS4999', 'CS499', '1:15-2:00', 'MWF', '500')");
+					System.out.println(check);
+					check=sql.executeUpdate("INSERT INTO teaches VALUES('wilson.james@lafayette.edu', 'CS4999')");
+					System.out.println(check);
+					check=sql.executeUpdate("INSERT INTO takes VALUES('rimal.james@lafayette.edu', 'CS4999')");
+					System.out.println(check);
+					check=sql.executeUpdate("INSERT INTO assignments VALUES(-1, 'CS499 Assignment #1', '2012-12-19', 'This is a test assignment', 'wilson.james@lafayette.edu', 'CS4999')");
+					System.out.println(check);
+					check=sql.executeUpdate("INSERT INTO questions VALUES(-1, 'question 1 for this assignment in cs499, the right answer is indicated')");
+					System.out.println(check);
+					check=sql.executeUpdate("INSERT INTO answers VALUES(1, 'a wrong answer in CS499 assignment 1 for q1 unique 1', -1, 'question 1 for this assignment in cs499, the right answer is indicated', false)");
+					System.out.println(check);
+					check=sql.executeUpdate("INSERT INTO answers VALUES(2, 'a wrong answer in CS499 assignment 1 for q1 unique 2', -1, 'question 1 for this assignment in cs499, the right answer is indicated', false)");
+					System.out.println(check);
+					check=sql.executeUpdate("INSERT INTO answers VALUES(3, 'a wrong answer in CS499 assignment 1 for q1 unique 3', -1, 'question 1 for this assignment in cs499, the right answer is indicated', false)");
+					System.out.println(check);
+					check=sql.executeUpdate("INSERT INTO answers VALUES(4, 'the correct answer in CS499 assignment 1 for q1', -1, 'question 1 for this assignment in cs499, the right answer is indicated', true)");
+					System.out.println(check);
+					check=sql.executeUpdate("INSERT INTO questions VALUES(-1, 'question 2 for assignment 1 in cs499....')");
+					System.out.println(check);
+					check=sql.executeUpdate("INSERT INTO answers VALUES(1, 'CORRECT ANSWER FOR question2', -1, 'question 2 for assignment 1 in cs499....', true)");
+					System.out.println(check);
+					check=sql.executeUpdate("INSERT INTO answers VALUES(2, 'incorrect answer for 2.... 1', -1, 'question 2 for assignment 1 in cs499....', false)");
+					System.out.println(check);
+					check=sql.executeUpdate("INSERT INTO answers VALUES(3, 'incorrect answer for 2.... 2', -1, 'question 2 for assignment 1 in cs499....', false)");
+					System.out.println(check);
+					check=sql.executeUpdate("INSERT INTO answers VALUES(4, 'incorrect answer for 2.... 3', -1, 'question 2 for assignment 1 in cs499....', false)");
+					System.out.println(check);
+				}catch(Exception e){ System.out.println("ERROR: "+e); }
+			}
+			else{ System.out.println("Already inserted once..."); }
+		}
 		else{
 			response.sendRedirect("index.jsp");
 		}

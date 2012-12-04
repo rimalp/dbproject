@@ -69,8 +69,9 @@ public class Student_Section_Servlet extends HttpServlet {
 			ResultSet rs = null;
 			
 			//name descr, deadline
+			//assignments.assignmentID IN (SELECT DISTINCT assignmentID FROM questions)..... for only assignments with questions
 			//AND to_date(deadline, 'YYYY-MM-DD') >= CURRENT_DATE for only active assignments
-			String assignments = "SELECT name, description, to_date(deadline, 'YYYY-MM-DD')::TEXT, assignmentID FROM assignments, takes WHERE assignments.CRN=takes.CRN AND takes.CRN='"+crn+"' AND takes.email='"+email+"' ORDER BY deadline ASC";
+			String assignments = "SELECT name, description, to_date(deadline, 'YYYY-MM-DD')::TEXT, assignmentID FROM assignments, takes WHERE assignments.assignmentID IN (SELECT DISTINCT assignmentID FROM questions) AND assignments.CRN=takes.CRN AND takes.CRN='"+crn+"' AND takes.email='"+email+"' ORDER BY deadline ASC";
 			rs = queryDB(assignments);
 			String[][] a = fillA(rs);
 			
