@@ -98,14 +98,14 @@ public class Student_Welcome_Servlet extends HttpServlet {
 			//section, description, type, deadline
 			//not sure we have a type column in the database
 			//query = String.format("SELECT name, description, to_date(deadline, 'YYYY-MM-DD'), assignments.assignmentID FROM assignments, takes WHERE takes.email='%s' AND takes.CRN=assignments.CRN AND to_date(deadline, 'YYYY-MM-DD') >= CURRENT_DATE ORDER BY deadline ASC", email);
-			query = String.format("SELECT name, description, to_date(deadline, 'YYYY-MM-DD'), assignments.assignmentID FROM assignments, takes WHERE takes.email='%s' AND takes.CRN=assignments.CRN AND to_date(deadline, 'YYYY-MM-DD') >= CURRENT_DATE ORDER BY deadline ASC", email);
+			query = String.format("SELECT name, description, to_date(deadline, 'YYYY-MM-DD'), assignments.assignmentID FROM assignments, takes WHERE assignments.assignmentID IN (SELECT DISTINCT assignmentID FROM questions) AND takes.email='%s' AND takes.CRN=assignments.CRN AND to_date(deadline, 'YYYY-MM-DD') >= CURRENT_DATE ORDER BY deadline ASC", email);
 			rs = queryDB(query);
 			//assignments.assignmentID IN (SELECT DISTINCT assignmentID FROM questions)
 			//^^in where clause of both queries to only display assignments which have questions associated with them
 			
 			String[][] currentAssignmentData= fillAssignmentData(rs);
 			
-			query="SELECT name, description, to_date(deadline, 'YYYY-MM-DD')::TEXT, assignments.assignmentID FROM assignments, takes WHERE takes.email='"+email+"' AND takes.CRN=assignments.CRN AND to_date(deadline, 'YYYY-MM-DD') < CURRENT_DATE ORDER BY deadline ASC";
+			query="SELECT name, description, to_date(deadline, 'YYYY-MM-DD')::TEXT, assignments.assignmentID FROM assignments, takes WHERE assignments.assignmentID IN (SELECT DISTINCT assignmentID FROM questions) AND takes.email='"+email+"' AND takes.CRN=assignments.CRN AND to_date(deadline, 'YYYY-MM-DD') < CURRENT_DATE ORDER BY deadline ASC";
 			rs= queryDB(query);
 			
 			String[][] oldAssignmentData=fillAssignmentData(rs);

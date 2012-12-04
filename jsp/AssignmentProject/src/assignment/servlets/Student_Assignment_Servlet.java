@@ -92,20 +92,18 @@ public class Student_Assignment_Servlet extends HttpServlet {
 			
 			String[][] q = questionArray(rs);
 			
-			//get student answers
-			//not sure this is right... where do we store student answers???
-			//HERHERHERHERHEHREHRHEHRHE
-			query="SELECT answerID FROM students WHERE answerID IN (SELECT answerID FROM questions, answers WHERE questions.prompt=answers.prompt AND answers.assignmentID=questions.assignmentID AND answers.assignmentID="+assignmentID+")";
+			//get last student submission if it exists
+			/*query="SELECT prompt, answerID FROM last_submission WHERE assignmentID='"+assignmentID+"' AND email='"+email+"' ORDER BY prompt";
 			
 			rs=queryDB(query);
-			String[] answersGiven=fillAnswers(rs);
-			
+			String[][] answersGiven=fillAnswers(rs);
+			*/
 			try{
 				request.setAttribute("assignmentID", assignmentID);
 				request.setAttribute("section", section);
 				request.setAttribute("assignment", assignment);
 				request.setAttribute("questions", q);
-				request.setAttribute("answersGiven", answersGiven);
+				//request.setAttribute("answersGiven", answersGiven);
 				request.getRequestDispatcher("student_single_assignment.jsp").forward(request, response);
 			}catch(IOException e) { System.out.println("ioexception: "+e); }
 			catch (ServletException e) { System.out.println("servlet exception: "+e); }
@@ -131,15 +129,16 @@ public class Student_Assignment_Servlet extends HttpServlet {
 		return r;
 	}
 	
-	private String[] fillAnswers(ResultSet rs)
+	private String[][] fillAnswers(ResultSet rs)
 	{
-		String[] r=new String[100];
+		String[][] r=new String[100][2];
 		try{
 			int i=0;
 			while(rs.next())
 			{
 				//System.out.println("questionArray: "+r[i][0]);
-				r[i]=Integer.toString(rs.getInt(1));
+				r[i][0]=rs.getString(1);
+				r[i][1]=Integer.toString(rs.getInt(2));
 				i++;
 			}
 		}catch(SQLException e) { System.out.println("SQLEXCEPTION: "+e); }
@@ -157,7 +156,8 @@ public class Student_Assignment_Servlet extends HttpServlet {
 		
 		if(request.getParameter("Save") != null)
 		{
-			int i=0;
+			System.out.println("No Save button");
+			/*int i=0;
 			while(request.getParameter("answer"+i) != null)
 			{
 				try{
@@ -170,6 +170,7 @@ public class Student_Assignment_Servlet extends HttpServlet {
 			//save checked answers
 			//show same page with with "SAVED" written at top
 			//same as doget??
+			*/
 		}
 		else if(request.getParameter("Submit") != null)
 		{
@@ -188,13 +189,43 @@ public class Student_Assignment_Servlet extends HttpServlet {
 			int numQuestions;
 			for(numQuestions=0; numQuestions<q.length && q[numQuestions][0]!=null; numQuestions++){}
 			
+			//boolean that states whether or not a last submission exists
+			/*boolean lastSubmissionExists=false;
+			rs=queryDB("SELECT email FROM last_submission WHERE assignmentID="+assignmentID+" AND email='"+email+"'");
+			try{
+				if(rs.next())
+				{
+					lastSubmissionExists=true;
+				}
+				else
+				{
+					System.out.println("last submission does not exist: "+lastSubmissionExists);
+				}
+			}catch(Exception e){ System.out.println("ERROR: "+e); }*/
+			
+			
 			//get student response in order
+			//save to last_submission table regardless
 			int n=0;//selected answer to question n
 			int correct=0;
 			while((String)request.getParameter("answer"+n) != null)
 			{
 				String answer=(String)request.getParameter("answer"+n);
 				System.out.println("given: "+answer+" current: "+q[n][1]+" correct: "+q[n][2]);
+				
+				//save to last_submission table
+				/*try{
+					if(lastSubmissionExists)
+					{
+						sql.executeUpdate("UPDATE last_submission SET answerID="+q[n][3]+" WHERE email='"+email+"' AND assignmentID="+assignmentID+" AND prompt='"+q[n][0]+"'");
+					}
+					else
+					{
+						sql.executeUpdate("INSERT INTO last_submission VALUES('"+email+"', "+assignmentID+", '"+q[n][0]+"', "+q[n][3]+")");
+					}
+				}catch(Exception e){ System.out.println("ERROR: "+e); }
+				*/
+				
 				if(answer.equals(q[n][2]) && q[n][2].equals("true"))
 				{
 					correct++;
@@ -223,7 +254,7 @@ public class Student_Assignment_Servlet extends HttpServlet {
 				try{
 					if(lastScore.next()){
 						lastScore.getDouble(1);
-						System.out.println(sql.executeUpdate("UPDATE assigned SET submit_time=CURRENT_TIMESTAMP, score="+(correct/numQuestions)+" WHERE assignmentID='"+assignmentID+"' AND email='"+email+"'"));
+						System.out.println(sql.executeUpdate("UPDATE assigned SET submit_time=CURRENT_TIMESTAMP, grade="+(correct/numQuestions)+" WHERE assignmentID='"+assignmentID+"' AND email='"+email+"'"));
 					}
 					else{
 						System.out.println("inserted....  "+sql.executeUpdate("INSERT INTO assigned VALUES("+assignmentID+", '"+email+"', "+(correct/numQuestions)+", CURRENT_TIMESTAMP)"));

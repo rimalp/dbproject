@@ -27,6 +27,10 @@
 <form method="post" action="loginpath">
   <input type="submit" name="show" value="Show First 5 Users" />
 </form>
+<br/>
+<form method="post" action="loginpath">
+  <input type="submit" name="insert" value="Temp Insert" />
+</form>
 <!--
 <br/>
 <br/>
