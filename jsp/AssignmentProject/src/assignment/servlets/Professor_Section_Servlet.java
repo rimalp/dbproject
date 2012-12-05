@@ -55,6 +55,7 @@ public class Professor_Section_Servlet extends HttpServlet {
 		// TODO Auto-generated method stub
 		
 		String crn=request.getParameter("id");
+		System.out.println("DOGET professor section servlet... crn: "+crn);
 		
 		HttpSession session = request.getSession();
 		String email = (String) session.getAttribute("currentEmail");

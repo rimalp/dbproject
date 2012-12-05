@@ -84,7 +84,7 @@ Score
 <% out.println(grades[i][1]);%>
 </td>
 <td class="centertable normalfont">
-<% out.println(grades[i][0]); %>
+<% out.println(Double.parseDouble(grades[i][0])*100); %>
 </td>
 </tr>
 <%} %>

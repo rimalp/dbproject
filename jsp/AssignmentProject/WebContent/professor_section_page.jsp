@@ -116,7 +116,7 @@ a {text-decoration: none;}
 				<ul>
 				<% for(int i=0; i<students.length && students[i][0] != null; i++){ %>
 				<li>
-				<% out.println("<a href=\"student_grades_servlet?email="+students[i][2]+"&crn="+(String)request.getParameter("CRN")+"\">"+students[i][0]+" "+students[i][1]+"</a> ("+students[i][2]+")"); %><br/>
+				<% out.println("<a href=\"student_grades_servlet?email="+students[i][2]+"&crn="+(String)request.getAttribute("CRN")+"\">"+students[i][0]+" "+students[i][1]+"</a> ("+students[i][2]+")"); %><br/>
 				</li>
 				<%} %>
 				</ul>

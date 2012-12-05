@@ -121,7 +121,7 @@ a {text-decoration: none;}
 						<%String[][] grades = (String[][])request.getAttribute("assignments_grades"); %>
 						<%for(int r=0; r<grades.length && grades[r][0] != null; r++) { %>
 						<tr>
-						<td><%out.print(grades[r][0]); %></td>
+						<td><% out.print(grades[r][0]); %></td>
 						<td>&nbsp;&nbsp;&nbsp;&nbsp;<%out.print(Double.parseDouble(grades[r][1])*100+"%"); %> </td>
 						</tr>
 						<%} %>
