@@ -107,12 +107,12 @@ public class Professor_Welcome_Servlet extends HttpServlet {
 			
 			//display course names, description, deadline, num completed / total in section, assignmentid for links
 			//current assignments
-			query="SELECT name, description, to_date(deadline, 'YYYY-MM-DD'), completed, num, assignments.assignmentID FROM ("+countTotal+") studentTotal, ("+countCompleted+") studentCompleted, assignments, teaches WHERE teaches.email='"+email+"' AND studentCompleted.CRN=teaches.CRN AND studentTotal.CRN=teaches.CRN AND teaches.CRN=assignments.CRN AND to_date(deadline, 'YYYY-MM-DD') >= CURRENT_DATE ORDER BY deadline ASC";
+			query="SELECT name, description, to_date(deadline, 'YYYY-MM-DD'), completed, num, assignments.assignmentID FROM ("+countTotal+") studentTotal, ("+countCompleted+") studentCompleted, assignments, teaches WHERE assignments.assignmentID IN (SELECT DISTINCT assignmentID FROM questions) AND teaches.email='"+email+"' AND studentCompleted.CRN=teaches.CRN AND studentTotal.CRN=teaches.CRN AND teaches.CRN=assignments.CRN AND to_date(deadline, 'YYYY-MM-DD') >= CURRENT_DATE ORDER BY deadline ASC";
 			rs=queryDB(query);
 			String[][] activeAssignmentData = fillAssignmentData(rs);
 			
 			//old assignments
-			query="SELECT name, description, to_date(deadline, 'YYYY-MM-DD'), completed, num, assignments.assignmentID FROM ("+countTotal+") studentTotal, ("+countCompleted+") studentCompleted, assignments, teaches WHERE teaches.email='"+email+"' AND studentCompleted.CRN=teaches.CRN AND studentTotal.CRN=teaches.CRN AND teaches.CRN=assignments.CRN AND to_date(deadline, 'YYYY-MM-DD') < CURRENT_DATE ORDER BY deadline ASC";
+			query="SELECT name, description, to_date(deadline, 'YYYY-MM-DD'), completed, num, assignments.assignmentID FROM ("+countTotal+") studentTotal, ("+countCompleted+") studentCompleted, assignments, teaches WHERE assignments.assignmentID IN (SELECT DISTINCT assignmentID FROM questions) AND teaches.email='"+email+"' AND studentCompleted.CRN=teaches.CRN AND studentTotal.CRN=teaches.CRN AND teaches.CRN=assignments.CRN AND to_date(deadline, 'YYYY-MM-DD') < CURRENT_DATE ORDER BY deadline ASC";
 			rs=queryDB(query);
 			String[][] oldAssignmentData = fillAssignmentData(rs);
 			

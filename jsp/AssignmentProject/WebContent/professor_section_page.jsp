@@ -116,7 +116,7 @@ a {text-decoration: none;}
 				<ul>
 				<% for(int i=0; i<students.length && students[i][0] != null; i++){ %>
 				<li>
-				<% out.println("<a href=\"student_grades_servlet?email="+students[i][2]+"&crn="+(String)request.getParameter("CRN")+"\">"+students[i][0]+" "+students[i][1]+"</a> ("+students[i][2]+")"); %><br/>
+				<% out.println("<a href=\"student_grades_servlet?email="+students[i][2]+"&crn="+(String)request.getAttribute("CRN")+"\">"+students[i][0]+" "+students[i][1]+"</a> ("+students[i][2]+")"); %><br/>
 				</li>
 				<%} %>
 				</ul>
@@ -198,7 +198,7 @@ Database Project
 <b class="headerfont"><% out.println(info[0]); %></b><br/><br/>
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<b class="bigbigfont">Assignments</b> (Sort by <button name="byType" type="button">Assignment Type</button>, <button name="byDeadline" type="button">Deadline</button>, <button name="other" type="button">More Sorts</button>):<br/><!-- options for sorting by practice/uploaded, deadline(default), others? each is a button-->
+<b class="bigbigfont">Assignments</b>
 
 <table border="0" cellpadding="0" cellspacing="9" width="100%" class="normalfont">
 <tr>

@@ -55,6 +55,7 @@ public class Professor_Section_Servlet extends HttpServlet {
 		// TODO Auto-generated method stub
 		
 		String crn=request.getParameter("id");
+		System.out.println("DOGET professor section servlet... crn: "+crn);
 		
 		HttpSession session = request.getSession();
 		String email = (String) session.getAttribute("currentEmail");
@@ -65,7 +66,7 @@ public class Professor_Section_Servlet extends HttpServlet {
 			
 			//name, descr, deadline
 			//AND to_date(deadline, 'YYYY-MM-DD') >= CURRENT_DATE for only active assigments.....::TEXT
-			String assignments = "SELECT name, description, to_date(deadline, 'YYYY-MM-DD')::TEXT, assignmentID FROM assignments, teaches WHERE assignments.CRN=teaches.CRN AND teaches.CRN='"+crn+"' AND teaches.email='"+email+"' ORDER BY deadline ASC";
+			String assignments = "SELECT name, description, to_date(deadline, 'YYYY-MM-DD')::TEXT, assignmentID FROM assignments, teaches WHERE assignments.assignmentID IN (SELECT DISTINCT assignmentID FROM questions) AND assignments.CRN=teaches.CRN AND teaches.CRN='"+crn+"' AND teaches.email='"+email+"' ORDER BY deadline ASC";
 			rs = queryDB(assignments);
 			String[][] a = fillA(rs);
 			

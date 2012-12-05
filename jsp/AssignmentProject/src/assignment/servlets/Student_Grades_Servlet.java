@@ -54,7 +54,8 @@ public class Student_Grades_Servlet extends HttpServlet {
 		
 		String studentEmail=(String)request.getParameter("email");
 		String crn=(String)request.getParameter("crn");
-		
+		System.out.println("DOGET student grades servlet... email: "+studentEmail+" crn: "+crn);
+		 
 		//get scores on assignments for this class
 		ResultSet scores=queryDB("SELECT grade, name FROM assigned, assignments WHERE assigned.assignmentID=assignments.assignmentID AND assignments.crn='"+crn+"' AND assigned.email='"+studentEmail+"'");
 		String[][] listGrades=new String[100][2];

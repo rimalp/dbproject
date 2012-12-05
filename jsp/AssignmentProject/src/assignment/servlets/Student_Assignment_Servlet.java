@@ -190,6 +190,8 @@ public class Student_Assignment_Servlet extends HttpServlet {
 			for(numQuestions=0; numQuestions<q.length && q[numQuestions][0]!=null; numQuestions++){}
 			
 			//boolean that states whether or not a last submission exists
+			//HERGERGERGERGERGGGGGGGGGGGGg
+			//$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 			/*boolean lastSubmissionExists=false;
 			rs=queryDB("SELECT email FROM last_submission WHERE assignmentID="+assignmentID+" AND email='"+email+"'");
 			try{
