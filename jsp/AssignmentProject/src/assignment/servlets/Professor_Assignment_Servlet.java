@@ -108,7 +108,7 @@ public class Professor_Assignment_Servlet extends HttpServlet {
 		
 		//System.out.println("professor assignment servlet... befoer if aid=-1");
 		
-		if(assignmentID != -1)
+		if(assignmentID != -2)//-1 is the assignment id of our test class cs499
 		{
 			//get all questions
 			//String query="SELECT questions.prompt, content, correct, answerID FROM questions, answers WHERE questions.prompt=answers.prompt AND answers.assignmentID=questions.assignmentID AND answers.assignmentID="+assignmentID+" ORDER BY questions.prompt";

@@ -68,7 +68,7 @@ Database Project
 <b class="headerfont"><% out.println(info[0]); %></b><br/><br/>
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<b class="bigbigfont">Assignments</b> (Sort by <button name="byType" type="button">Assignment Type</button>, <button name="byDeadline" type="button">Deadline</button>, <button name="other" type="button">More Sorts</button>):<br/><!-- options for sorting by practice/uploaded, deadline(default), others? each is a button-->
+<b class="bigbigfont">Assignments</b>
 
 <table border="0" cellpadding="0" cellspacing="9" width="100%" class="normalfont">
 <tr>
