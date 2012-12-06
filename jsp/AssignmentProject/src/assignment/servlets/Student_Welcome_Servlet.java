@@ -86,7 +86,14 @@ public class Student_Welcome_Servlet extends HttpServlet {
 			
 			//String[][] sectionData = fillSectionData(rs);
 			//System.out.println("11111111111111111111111111111111111");
+			
+			
+			//get the sections that have no assignments
+			ResultSet noAssignments=queryDB("SELECT course, takes.CRN FROM sections, takes WHERE NOT EXISTS (SELECT assignmentID FROM assignments WHERE assignments.CRN=takes.CRN) AND sections.CRN=takes.CRN AND takes.email='"+email+"' GROUP BY course, takes.CRN ORDER BY course");
+			String[][] empty=fillEmpty(noAssignments);
+			
 			try{
+				request.setAttribute("empty", empty);
 				request.setAttribute("sectionData", sectionData);
 				request.getRequestDispatcher("student_sections.jsp").forward(request, response);
 			}catch(IOException e) { System.out.println("ioexception: "+e); }
@@ -125,6 +132,23 @@ public class Student_Welcome_Servlet extends HttpServlet {
 		
 	}
 
+	private String[][] fillEmpty(ResultSet rs)
+	{
+		String[][] r=new String[10][2];
+		
+		try{
+			int i=0;
+			while(rs.next())
+			{
+				//System.out.println("HERGERGEG: "+count.getString(1));
+				r[i][0]=rs.getString(1);
+				r[i][1]=rs.getString(2);
+				i++;
+			}
+		}catch(SQLException e) { System.out.println("SQLEXCEPTION: "+e); }
+		
+		return r;
+	}
 	
 	/*
 	 * fills section data array with data from rs (result of query)

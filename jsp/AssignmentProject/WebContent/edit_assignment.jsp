@@ -73,27 +73,27 @@ a {text-decoration: none;}
 				%>
 				
 				<form class="well" method="post" action="make_assignment_servlet?ID=<% out.println(id); %>&numQuestions=<% out.println(questions.length); %>">
-				<% int i; 
+				<% int i;
 				for(i=0; i<questions.length && questions[i][0]!=null; i+=4){//assume 4 answers per question for now%>
-				<% out.println((i/4+1)+") "); %>Enter question: <% out.println("<input class=\"span9\" type=\"text\"  a value=\"" +questions[i][0]+"\" name=\"question"+i+"\">"); %> &nbsp;&nbsp;&nbsp;&nbsp;<text class="text-error">Delete&nbsp;&nbsp;</text><input type="checkbox" name="delete" value="<% out.println(questions[i][0]); %>"><br/>
+				<% out.println((i/4+1)+") "); %>Enter question: <% out.println("<input class=\"span9\" type=\"text\"  a value=\"" +questions[i][0]+"\" name=\"question"+(i/4)+"\">"); %> &nbsp;&nbsp;&nbsp;&nbsp;<text class="text-error">Delete&nbsp;&nbsp;</text><input type="checkbox" name="delete" value="<% out.println(questions[i][0]); %>"><br/>
 				Enter up to 4 potential answers:<br/>
-				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;a) <% out.println("<input  class=\"span7\" type=\"text\"  value=\"" +questions[i][1]+"\"name=\"answer"+i+"a\">"); %><br/>
-				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;b) <% out.println("<input  class=\"span7\" type=\"text\"  value=\"" +questions[i+1][1]+"\"name=\"answer"+i+"b\">"); %><br/>
-				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;c) <% out.println("<input  class=\"span7\" type=\"text\"  value=\"" +questions[i+2][1]+"\"name=\"answer"+i+"c\">"); %><br/>
-				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;d) <% out.println("<input  class=\"span7\" type=\"text\"  value=\"" +questions[i+3][1]+"\"name=\"answer"+i+"d\">"); %><br/>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;a) <% out.println("<input  class=\"span7\" type=\"text\"  value=\"" +questions[i][1]+"\"name=\"answer"+(i/4)+"a\">"); %><br/>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;b) <% out.println("<input  class=\"span7\" type=\"text\"  value=\"" +questions[i+1][1]+"\"name=\"answer"+(i/4)+"b\">"); %><br/>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;c) <% out.println("<input  class=\"span7\" type=\"text\"  value=\"" +questions[i+2][1]+"\"name=\"answer"+(i/4)+"c\">"); %><br/>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;d) <% out.println("<input  class=\"span7\" type=\"text\"  value=\"" +questions[i+3][1]+"\"name=\"answer"+(i/4)+"d\">"); %><br/>
 <!-- 				Path of any images to be displayed with this problem: <input type="text"><br/>
  -->				
  				<br/>
 				<table>
 				<tr>
 				<td&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;>Mark any correct answers:</td>
-				<td>a)<input type="checkbox" name="correct" <%if(questions[i][2].equals("true")) out.println("checked=\"checked\""); %> value="1"></td>
-				<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;b)<input type="checkbox" name="correct" <%if(questions[i+1][2].equals("true")) out.println("checked=\"checked\""); %> value="2"></td>
+				<td>a)<input type="checkbox" name="correct" <%if(questions[i][2].equals("true")) out.println("checked=\"checked\""); %> value="<% out.print((i/4+1)); %>a"></td>
+				<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;b)<input type="checkbox" name="correct" <%if(questions[i+1][2].equals("true")) out.println("checked=\"checked\""); %> value="<% out.print((i/4+1)); %>b"></td>
 				</tr>
 				<tr>
 				<td></td>
-				<td>c)<input type="checkbox" name="correct"  <%if(questions[i+2][2].equals("true")) out.println("checked=\"checked\""); %> value="3"></td>
-				<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;d)<input type="checkbox" name="correct"  <%if(questions[i+3][2].equals("true")) out.println("checked=\"checked\""); %> value="4"></td>
+				<td>c)<input type="checkbox" name="correct"  <%if(questions[i+2][2].equals("true")) out.println("checked=\"checked\""); %> value="<% out.print((i/4+1)); %>c"></td>
+				<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;d)<input type="checkbox" name="correct"  <%if(questions[i+3][2].equals("true")) out.println("checked=\"checked\""); %> value="<% out.print((i/4+1)); %>d"></td>
 				</tr>
 				</table>
 				<br>

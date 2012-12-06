@@ -59,7 +59,8 @@ a {text-decoration: none;}
 					</table>
 					<br><br>
 						
-					<% String[][] data=(String[][])request.getAttribute("data");%>
+					<% String[][] data=(String[][])request.getAttribute("data");
+					   String[][] empty=(String[][])request.getAttribute("empty"); %>
 						
 					<table class="table table-striped" border="0" cellpadding="0" cellspacing="9" style="width:75%">
 						<tr class="text-info">
@@ -70,7 +71,7 @@ a {text-decoration: none;}
 							Active Assignments
 							</b></th>
 							<th align="left"><b>
-							Deadline
+							Number of Students
 							</b></th>
 						</tr>
 						
@@ -85,6 +86,22 @@ a {text-decoration: none;}
 							</td>
 							<td align="right" class="centerable">
 							<% out.print(data[i][2]); %>
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							</td>
+						</tr>
+						<%}
+						}%>
+						<% for(int i=0; i<empty.length; i++){ 
+						if(empty[i][0] != null){%>
+						<tr class="normalfont">
+							<td>
+							<% out.print("<a href=\"professor_section_servlet_path?id="+empty[i][2]+"\">"+empty[i][0]+"</a>");%>
+							</td>
+							<td align="center" class="centerable normalfont">
+							<% out.print("0"); %>
+							</td>
+							<td align="right" class="centerable">
+							<% out.print(empty[i][1]); %>
 							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 							</td>
 						</tr>
