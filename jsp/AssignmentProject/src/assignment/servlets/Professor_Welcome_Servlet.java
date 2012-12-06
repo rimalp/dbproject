@@ -75,8 +75,21 @@ public class Professor_Welcome_Servlet extends HttpServlet {
 			rs=queryDB(query);
 			
 			String[][] sectionData = fillData(rs);
+			for(int i=0; i<sectionData.length && sectionData[i][0] != null; i++)
+			{
+				for(int j=0; j<sectionData[i].length; j++)
+				{
+					System.out.print("AAAAAAAAA: "+sectionData[i][j]);
+				}
+				System.out.println();
+			}
+			//get sections with no assignments
+			ResultSet noAssignments=queryDB("SELECT course, num, teaches.CRN FROM ("+numStudents+") studentCount, sections, teaches WHERE studentCount.CRN=teaches.CRN AND sections.CRN=teaches.CRN AND teaches.email='"+email+"' AND NOT EXISTS (SELECT assignmentID FROM assignments WHERE assignments.CRN=teaches.CRN) GROUP BY course, teaches.CRN, num ORDER BY course");
+			String[][] empty=fillEmpty(noAssignments);
+			
 			
 			try{
+				request.setAttribute("empty", empty);
 				request.setAttribute("sectionData", sectionData);
 				request.getRequestDispatcher("professor_sections.jsp").forward(request, response);
 			}catch(IOException e) { System.out.println("ioexception: "+e); }
@@ -130,6 +143,24 @@ public class Professor_Welcome_Servlet extends HttpServlet {
 		
 	}
 
+	private String[][] fillEmpty(ResultSet rs)
+	{
+		String[][] r=new String[50][3];
+		try{
+			int i=0;
+			while(rs.next())
+			{
+				System.out.println("fillempty: "+rs.getString(1));
+				r[i][0]=rs.getString(1);
+				r[i][1]=Integer.toString(rs.getInt(2));
+				r[i][2]=rs.getString(3);
+				i++;
+			}
+		}catch(SQLException e) { System.out.println("SQLEXCEPTION: "+e); }
+		
+		return r;
+	}
+	
 	/*
 	 * fills the assignment data for professors appropriately
 	 */

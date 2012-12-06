@@ -78,6 +78,7 @@ a {text-decoration: none;}
 						</tr>
 						
 						<% String[][] data = (String[][])request.getAttribute("sectionData"); 
+						String[][] empty=(String[][])request.getAttribute("empty");
 						for(int i=0; i<data.length; i++){
 						if(data[i][0] != null){%>
 						<tr>
@@ -88,6 +89,17 @@ a {text-decoration: none;}
 						<td class="text-info"><% if(data[i][2] != null) {
 							out.println(data[i][2]); 
 							}%></td>
+						</tr>
+							<% }
+							} %>
+						<% for(int i=0; i<empty.length; i++){
+						if(empty[i][0] != null){%>
+						<tr>
+						<td class="text-info">
+						<% out.println("<a href=\"student_section_servlet_path?id="+empty[i][1]+"\">"+empty[i][0]+"</a>");%>
+						</td>
+						<td class="text-info"><% out.println("0"); %></td>
+						<td class="text-info"><%%></td>
 						</tr>
 							<% }
 							} %>

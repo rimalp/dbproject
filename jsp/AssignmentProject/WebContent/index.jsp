@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>Insert title here</title>
+<title>Login</title>
 <link type="text/css" rel="stylesheet" href="css/bootstrap.css" />
 <link type="text/css" rel="stylesheet"
 	href="css/bootstrap-responsive.css" />
@@ -41,8 +41,11 @@
 	begin test portion
 	<br />
 	<br />
-
-
+	
+<!-- to insert fake data into db -->
+<form method="post" action="loginpath">
+<input type="submit" name="insert" value="Insert" />
+</form>
 
 
 </body>

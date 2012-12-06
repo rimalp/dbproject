@@ -71,25 +71,48 @@ public class LoginServlet extends HttpServlet {
 		String numStudentsQuery="SELECT CRN, COUNT(DISTINCT email) AS num FROM takes WHERE CRN IN (SELECT CRN FROM teaches WHERE email='"+username+"') GROUP BY CRN";
 		
 		
-		
 		//for professor want course, active assignments, number of students, (crns of sections for links)
 		String countQuery = "SELECT course, COUNT(DISTINCT assignmentID), num, sections.CRN FROM ("+numStudentsQuery+") studentCount, sections, teaches, takes, assignments WHERE studentCount.CRN=teaches.CRN AND sections.CRN=teaches.CRN AND assignments.CRN=teaches.CRN AND teaches.email='"+username+"' AND to_date(deadline, 'YYYY-MM-DD') > CURRENT_DATE GROUP BY course, sections.CRN, num";
 		ResultSet assignmentCount = queryDB(countQuery);
+
 		String[][] data = addStudentCount(assignmentCount);
 		
 		/*System.out.println("TESTSTSTSTSTS");
 		//test print for this data
-		for(int i=0; i<data.length; i++)
+		for(int i=0; i<data.length && data[0][0] != null; i++)
 		{
 			System.out.println(data[i][0]+" "+data[i][1]+" "+data[i][2]+" "+data[i][3]);
 		}*/
 		
+		
+		ResultSet emptyAssignments=queryDB("SELECT course, num, sections.CRN FROM ("+numStudentsQuery+") studentCount, sections, teaches, takes WHERE studentCount.CRN=teaches.CRN AND sections.CRN=teaches.CRN AND NOT EXISTS (SELECT assignmentID FROM assignments WHERE assignments.CRN=teaches.CRN) AND teaches.email='"+username+"' GROUP BY course, sections.CRN, num");
+		String[][] empty = fillEmpty(emptyAssignments);
+		
 		try{
+			request.setAttribute("empty", empty);
 			request.setAttribute("data", data);
 			request.getRequestDispatcher("professor_welcome.jsp").forward(request, response);
 		}catch(IOException e) { System.out.println("ioexception: "+e); }
 		catch (ServletException e) { System.out.println("servlet exception: "+e); }
 		
+	}
+	
+	private String[][] fillEmpty(ResultSet rs)
+	{
+		String[][] r=new String[10][3];
+		try{
+			int i=0;
+			while(rs.next())
+			{
+				//System.out.println("HERGERGEG: "+count.getString(1));
+				r[i][0]=rs.getString(1);
+				r[i][1]=Integer.toString(rs.getInt(2));
+				r[i][2]=rs.getString(3);
+				i++;
+			}
+		}catch(SQLException e) { System.out.println("SQLEXCEPTION: "+e); }
+		
+		return r;
 	}
 	
 	private String[][] addStudentCount(ResultSet rs)
@@ -129,15 +152,32 @@ public class LoginServlet extends HttpServlet {
 		ResultSet rest = queryDB("("+allCourses+") EXCEPT ("+withActive+")");
 		data = addWOCounts(data, rest);
 		
+		//get crns of sections with no assignments
+		ResultSet noAssignments=queryDB("SELECT course, sections.CRN FROM sections, takes WHERE takes.email='"+username+"' AND takes.CRN=sections.CRN AND NOT EXISTS (SELECT assignmentID FROM assignments WHERE assignments.CRN=takes.CRN) GROUP BY course, sections.CRN");
+		String[][] empty=fillEmptyStudent(noAssignments);
+		for(int i=0; i<data.length && data[i][0] != null; i++)
+		{
+			if(data[i][2] == null)
+			{
+				for(int j=0; j<empty.length && empty[j][0] != null; j++)
+				{
+					if(empty[j][0].equals(data[i][0]))
+					{
+						data[i][2]=empty[j][1];
+					}
+				}
+			}
+		}
+		
 		//test print data... any classes with no assignments?
-		/*for(int i=0; i<data.length; i++)
+		for(int i=0; i<data.length; i++)
 		{
 			for(int j=0; j<data[i].length; j++)
 			{
 				System.out.print(data[i][j]+": ");
 			}
 			System.out.println();
-		}*/
+		}
 		//System.out.println("222222222222222222222222222222");
 		//assumes no student takes more than 10 sections...
 		//could add in checks to grow array if needed or use arraylist
@@ -149,13 +189,24 @@ public class LoginServlet extends HttpServlet {
 			request.getRequestDispatcher("student_welcome.jsp").forward(request, response);
 		}catch(IOException e) { System.out.println("ioexception: "+e); }
 		catch (ServletException e) { System.out.println("servlet exception: "+e); }
-		
-		//System.out.println("The button pressed for student login: " + request.getParameter("login"));
-
-		//response.sendRedirect("student_welcome.jsp");
-		//response.sendRedirect("student_welcome_path");
 	}
 	
+	private String[][] fillEmptyStudent(ResultSet rs)
+	{
+		String[][] r=new String[10][2];
+		try{
+			int i=0;
+			while(rs.next())
+			{
+				//System.out.println("HERGERGEG: "+count.getString(1));
+				r[i][0]=rs.getString(1);
+				r[i][1]=rs.getString(2);
+				i++;
+			}
+		}catch(SQLException e) { System.out.println("SQLEXCEPTION: "+e); }
+		
+		return r;
+	}
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -279,44 +330,135 @@ public class LoginServlet extends HttpServlet {
 		//End test portion//
 		else if(request.getParameter("insert") != null)
 		{
-			//run this once to add a class for rimal james to take and wilson james to teach wih assignments etc.
+			//run this once to add fake data for demo purposes
 			//WARNING... this data already inserted once...
 			boolean inserted=true;
 			if(!inserted){
 				try{
-					System.out.println("inserting test values into database");
+					System.out.println("inserting demo values into database");
 					int check=-1;
-					check=sql.executeUpdate("INSERT INTO sections VALUES('CS4999', 'CS499', '1:15-2:00', 'MWF', '500')");
-					System.out.println(check);
-					check=sql.executeUpdate("INSERT INTO teaches VALUES('wilson.james@lafayette.edu', 'CS4999')");
-					System.out.println(check);
-					check=sql.executeUpdate("INSERT INTO takes VALUES('rimal.james@lafayette.edu', 'CS4999')");
-					System.out.println(check);
-					check=sql.executeUpdate("INSERT INTO assignments VALUES(-1, 'CS499 Assignment #1', '2012-12-19', 'This is a test assignment', 'wilson.james@lafayette.edu', 'CS4999')");
-					System.out.println(check);
-					check=sql.executeUpdate("INSERT INTO questions VALUES(-1, 'question 1 for this assignment in cs499, the right answer is indicated')");
-					System.out.println(check);
-					check=sql.executeUpdate("INSERT INTO answers VALUES(1, 'a wrong answer in CS499 assignment 1 for q1 unique 1', -1, 'question 1 for this assignment in cs499, the right answer is indicated', false)");
-					System.out.println(check);
-					check=sql.executeUpdate("INSERT INTO answers VALUES(2, 'a wrong answer in CS499 assignment 1 for q1 unique 2', -1, 'question 1 for this assignment in cs499, the right answer is indicated', false)");
-					System.out.println(check);
-					check=sql.executeUpdate("INSERT INTO answers VALUES(3, 'a wrong answer in CS499 assignment 1 for q1 unique 3', -1, 'question 1 for this assignment in cs499, the right answer is indicated', false)");
-					System.out.println(check);
-					check=sql.executeUpdate("INSERT INTO answers VALUES(4, 'the correct answer in CS499 assignment 1 for q1', -1, 'question 1 for this assignment in cs499, the right answer is indicated', true)");
-					System.out.println(check);
-					check=sql.executeUpdate("INSERT INTO questions VALUES(-1, 'question 2 for assignment 1 in cs499....')");
-					System.out.println(check);
-					check=sql.executeUpdate("INSERT INTO answers VALUES(1, 'CORRECT ANSWER FOR question2', -1, 'question 2 for assignment 1 in cs499....', true)");
-					System.out.println(check);
-					check=sql.executeUpdate("INSERT INTO answers VALUES(2, 'incorrect answer for 2.... 1', -1, 'question 2 for assignment 1 in cs499....', false)");
-					System.out.println(check);
-					check=sql.executeUpdate("INSERT INTO answers VALUES(3, 'incorrect answer for 2.... 2', -1, 'question 2 for assignment 1 in cs499....', false)");
-					System.out.println(check);
-					check=sql.executeUpdate("INSERT INTO answers VALUES(4, 'incorrect answer for 2.... 3', -1, 'question 2 for assignment 1 in cs499....', false)");
-					System.out.println(check);
+					
+					//create users
+					System.out.println("inserting users");
+					sql.executeUpdate("INSERT INTO users VALUES('xia.ge@lafayette.edu', 'Ge', 'Xia', 'xia', 'Lafayette')");
+					sql.executeUpdate("INSERT INTO users VALUES('taylor.matthew@lafayette.edu', 'Matthew', 'Taylor', 'matthew', 'Lafayette')");
+					sql.executeUpdate("INSERT INTO users VALUES('liew.chun@lafayette.edu', 'Chun', 'Liew', 'liew', 'Lafayette')");
+					sql.executeUpdate("INSERT INTO users VALUES('li.xiaoyan@lafayette.edu', 'Xiaoyan', 'Li', 'xiaoyan', 'Lafayette')");
+					
+					sql.executeUpdate("INSERT INTO users VALUES('james.wilson@lafayette.edu', 'Wilson', 'James', 'james', 'Lafayette')");
+					sql.executeUpdate("INSERT INTO users VALUES('reid.john@lafayette.edu', 'John', 'Reid', 'reid', 'Lafayette')");
+					sql.executeUpdate("INSERT INTO users VALUES('hunter.robert@lafayette.edu', 'Robert', 'Hunter', 'hunter', 'Lafayette')");
+					sql.executeUpdate("INSERT INTO users VALUES('lewis.mary@lafayette.edu', 'Mary', 'Lewis', 'lewis', 'Lafayette')");
+					sql.executeUpdate("INSERT INTO users VALUES('anderson.laura@lafayette.edu', 'Laura', 'Anderson', 'anderson', 'Lafayette')");
+					sql.executeUpdate("INSERT INTO users VALUES('hall.brian@lafayette.edu', 'Brian', 'Hall', 'hall', 'Lafayette')");
+					
+					//add users as students or professors
+					//add professors
+					System.out.println("inserting professors");
+					sql.executeUpdate("INSERT INTO professors VALUES('xia.ge@lafayette.edu', '1:00-5:00', 'AEC 512')");
+					sql.executeUpdate("INSERT INTO professors VALUES('taylor.matthew@lafayette.edu', '11:00-5:30', 'AEC 509')");
+					sql.executeUpdate("INSERT INTO professors VALUES('liew.chun@lafayette.edu', '9:30-4:45', 'AEC 517')");
+					sql.executeUpdate("INSERT INTO professors VALUES('li.xiaoyan@lafayette.edu', '8:00-12:30', 'AEC 510')");
+					
+					//add students
+					System.out.println("inserting students");
+					sql.executeUpdate("INSERT INTO students VALUES('james.wilson@lafayette.edu', 2014, 'CS', 1)");
+					sql.executeUpdate("INSERT INTO students VALUES('reid.john@lafayette.edu', 2013, 'ECON', 1)");
+					sql.executeUpdate("INSERT INTO students VALUES('hunter.robert@lafayette.edu', 2014, 'MATH', 1)");
+					sql.executeUpdate("INSERT INTO students VALUES('lewis.mary@lafayette.edu', 2015, 'CS', 1)");
+					sql.executeUpdate("INSERT INTO students VALUES('anderson.laura@lafayette.edu', 2016, 'CS', 1)");
+					sql.executeUpdate("INSERT INTO students VALUES('hall.brian@lafayette.edu', 2016, 'ART', 1)");
+					
+					//create courses(sections) for demo
+					System.out.println("inserting sections");
+					sql.executeUpdate("INSERT INTO sections VALUES('CS2151', 'CS215', '1:10-2:00', 'MWF', 'AEC 500')");
+					sql.executeUpdate("INSERT INTO sections VALUES('CS2152', 'CS215', '2:10-3:00', 'MWF', 'AEC 500')");
+					sql.executeUpdate("INSERT INTO sections VALUES('CS2153', 'CS215', '8:00-9:30', 'TR', 'AEC 515')");
+					
+					sql.executeUpdate("INSERT INTO sections VALUES('CS3011', 'CS301', '8:00-9:30', 'TR', 'AEC 517')");
+					sql.executeUpdate("INSERT INTO sections VALUES('CS3012', 'CS301', '11:00-12:15', 'TR', 'AEC 510')");
+					
+					sql.executeUpdate("INSERT INTO sections VALUES('MATH1871', 'MATH187', '11:00-12:15', 'TR', 'PARDEE 210')");
+					
+					sql.executeUpdate("INSERT INTO sections VALUES('MATH2921', 'MATH292', '9:00-9:50', 'MWF', 'PARDEE 201')");
+					sql.executeUpdate("INSERT INTO sections VALUES('MATH2922', 'MATH292', '1:15-2:45', 'TR', 'PARDEE 221')");
+					
+					sql.executeUpdate("INSERT INTO sections VALUES('ECON1501', 'ECON150', '10:00-11:15', 'MW', 'SIMON 115')");
+					
+					sql.executeUpdate("INSERT INTO sections VALUES('ART1011', 'ART101', '11:00-12:15', 'TR', 'WILLIAMS 118')");
+					sql.executeUpdate("INSERT INTO sections VALUES('ART1012', 'ART101', '3:10-4:00', 'MWF', 'WILLIAMS 117')");
+					
+					//assign professors to teach each section
+					System.out.println("inserting into teaches");
+					sql.executeUpdate("INSERT INTO teaches VALUES('xia.ge@lafayette.edu', 'CS2151')");
+					sql.executeUpdate("INSERT INTO teaches VALUES('xia.ge@lafayette.edu', 'CS2152')");
+					sql.executeUpdate("INSERT INTO teaches VALUES('taylor.matthew@lafayette.edu', 'CS2153')");
+					
+					sql.executeUpdate("INSERT INTO teaches VALUES('liew.chun@lafayette.edu', 'CS3011')");
+					sql.executeUpdate("INSERT INTO teaches VALUES('xia.ge@lafayette.edu', 'CS3012')");
+					
+					sql.executeUpdate("INSERT INTO teaches VALUES('li.xiaoyan@lafayette.edu', 'MATH1871')");
+					
+					sql.executeUpdate("INSERT INTO teaches VALUES('liew.chun@lafayette.edu', 'MATH2921')");
+					sql.executeUpdate("INSERT INTO teaches VALUES('taylor.matthew@lafayette.edu', 'MATH2922')");
+					
+					sql.executeUpdate("INSERT INTO teaches VALUES('li.xiaoyan@lafayette.edu', 'ECON1501')");
+					
+					sql.executeUpdate("INSERT INTO teaches VALUES('liew.chun@lafayette.edu', 'ART1011')");
+					sql.executeUpdate("INSERT INTO teaches VALUES('xia.ge@lafayette.edu', 'ART1012')");
+					
+					//assign students to take each section
+					System.out.println("inserting into takes");
+					sql.executeUpdate("INSERT INTO takes VALUES('james.wilson@lafayette.edu', 'CS2151')");
+					sql.executeUpdate("INSERT INTO takes VALUES('reid.john@lafayette.edu', 'CS2151')");
+					sql.executeUpdate("INSERT INTO takes VALUES('anderson.laura@lafayette.edu', 'CS2151')");
+					
+					sql.executeUpdate("INSERT INTO takes VALUES('hunter.robert@lafayette.edu', 'CS2152')");
+					sql.executeUpdate("INSERT INTO takes VALUES('lewis.mary@lafayette.edu', 'CS2152')");
+					
+					sql.executeUpdate("INSERT INTO takes VALUES('hall.brian@lafayette.edu', 'CS2153')");
+					
+					sql.executeUpdate("INSERT INTO takes VALUES('james.wilson@lafayette.edu', 'CS3011')");
+					sql.executeUpdate("INSERT INTO takes VALUES('anderson.laura@lafayette.edu', 'CS3011')");
+					sql.executeUpdate("INSERT INTO takes VALUES('lewis.mary@lafayette.edu', 'CS3011')");
+					sql.executeUpdate("INSERT INTO takes VALUES('hall.brian@lafayette.edu', 'CS3011')");
+					
+					sql.executeUpdate("INSERT INTO takes VALUES('hunter.robert@lafayette.edu', 'CS3012')");
+					sql.executeUpdate("INSERT INTO takes VALUES('reid.john@lafayette.edu', 'CS3012')");
+					sql.executeUpdate("INSERT INTO takes VALUES('james.wilson@lafayette.edu', 'CS3012')");
+					
+					sql.executeUpdate("INSERT INTO takes VALUES('hunter.robert@lafayette.edu', 'MATH1871')");
+					sql.executeUpdate("INSERT INTO takes VALUES('hall.brian@lafayette.edu', 'MATH1871')");
+					sql.executeUpdate("INSERT INTO takes VALUES('james.ge@lafayette.edu', 'MATH1871')");
+					sql.executeUpdate("INSERT INTO takes VALUES('lewis.mary@lafayette.edu', 'MATH1871')");
+					
+					sql.executeUpdate("INSERT INTO takes VALUES('anderson.laura@lafayette.edu', 'MATH2921')");
+					sql.executeUpdate("INSERT INTO takes VALUES('reid.john@lafayette.edu', 'MATH2921')");
+					sql.executeUpdate("INSERT INTO takes VALUES('james.wilson@lafayette.edu', 'MATH2921')");
+					
+					sql.executeUpdate("INSERT INTO takes VALUES('lewis.mary@lafayette.edu', 'MATH2922')");
+					sql.executeUpdate("INSERT INTO takes VALUES('hunter.robert@lafayette.edu', 'MATH2922')");
+					
+					sql.executeUpdate("INSERT INTO takes VALUES('anderson.laura@lafayette.edu', 'ECON1501')");
+					sql.executeUpdate("INSERT INTO takes VALUES('hunter.robert@lafayette.edu', 'ECON1501')");
+					sql.executeUpdate("INSERT INTO takes VALUES('lewis.mary@lafayette.edu', 'ECON1501')");
+					sql.executeUpdate("INSERT INTO takes VALUES('reid.john@lafayette.edu', 'ECON1501')");
+					sql.executeUpdate("INSERT INTO takes VALUES('james.wilson@lafayette.edu', 'ECON1501')");
+					
+					sql.executeUpdate("INSERT INTO takes VALUES('hunter.robert@lafayette.edu', 'ART1011')");
+					sql.executeUpdate("INSERT INTO takes VALUES('hall.brian@lafayette.edu', 'ART1011')");
+					sql.executeUpdate("INSERT INTO takes VALUES('lewis.mary@lafayette.edu', 'ART1011')");
+					
+					sql.executeUpdate("INSERT INTO takes VALUES('anderson.laura@lafayette.edu', 'ART1012')");
+					sql.executeUpdate("INSERT INTO takes VALUES('james.wilson@lafayette.edu', 'ART1012')");
+					
+					//assignments can then be created by the professors
+					//so the tables assignments, answers, questions, last_submission
+					//can all be filled from within the site
+					
 				}catch(Exception e){ System.out.println("ERROR: "+e); }
 			}
-			else{ System.out.println("Already inserted once..."); }
+			else{ System.out.println("Already inserted..."); }
 		}
 		else{
 			response.sendRedirect("index.jsp");
