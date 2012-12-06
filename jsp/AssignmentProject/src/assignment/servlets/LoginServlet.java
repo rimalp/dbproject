@@ -341,9 +341,9 @@ public class LoginServlet extends HttpServlet {
 					//create users
 					System.out.println("inserting users");
 					sql.executeUpdate("INSERT INTO users VALUES('xia.ge@lafayette.edu', 'Ge', 'Xia', 'xia', 'Lafayette')");
-					sql.executeUpdate("INSERT INTO users VALUES('taylor.matthew@lafayette.edu', 'Matthew', 'Taylor', 'matthew', 'Lafayette')");
+					sql.executeUpdate("INSERT INTO users VALUES('taylor.matthew@lafayette.edu', 'Matthew', 'Taylor', 'taylor', 'Lafayette')");
 					sql.executeUpdate("INSERT INTO users VALUES('liew.chun@lafayette.edu', 'Chun', 'Liew', 'liew', 'Lafayette')");
-					sql.executeUpdate("INSERT INTO users VALUES('li.xiaoyan@lafayette.edu', 'Xiaoyan', 'Li', 'xiaoyan', 'Lafayette')");
+					sql.executeUpdate("INSERT INTO users VALUES('li.xiaoyan@lafayette.edu', 'Xiaoyan', 'Li', 'li', 'Lafayette')");
 					
 					sql.executeUpdate("INSERT INTO users VALUES('james.wilson@lafayette.edu', 'Wilson', 'James', 'james', 'Lafayette')");
 					sql.executeUpdate("INSERT INTO users VALUES('reid.john@lafayette.edu', 'John', 'Reid', 'reid', 'Lafayette')");
