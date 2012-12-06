@@ -64,10 +64,10 @@ a {text-decoration: none;}
 					<table class="table table-striped" border="0" cellpadding="0" cellspacing="9" style="width:75%">
 						<tr class="text-info">
 							<th align="left"><b>
-							Active Assignments
+							Sections
 							</b></th>
 							<th align="left"><b>
-							Deadline
+							Active Assignments
 							</b></th>
 						</tr>
 							<% for(int i=0; i<data.length; i++){ 

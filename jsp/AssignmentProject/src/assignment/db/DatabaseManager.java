@@ -14,10 +14,17 @@ public class DatabaseManager {
 	private static Statement sql;
 	private static DatabaseMetaData dbmd;
 
+	//local on my laptop
 	private static final String database = "//localhost:5432/lafworks";
 	private static final String username = "postgres";
 	private static final String password = "abc";
 
+	//with ssh tunnel to tomcat
+	/*
+	 * private static final String database = "//localhost:5430/assignmentdb";
+	private static final String username = "assignmentdb";
+	private static final String password = "PfmJrZk5";
+	 */
 
 	public DatabaseManager() throws ClassNotFoundException, SQLException{
 

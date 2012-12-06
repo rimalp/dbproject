@@ -111,6 +111,11 @@ public class Make_Assignment_Servlet extends HttpServlet {
 
 				char[] answ={'a','b','c','d'};
 				String[] correct=(String[])request.getParameterValues("correct");
+				System.out.println("CORRECT ARRAY");
+				for(int y=0; y<correct.length; y++)
+				{
+					System.out.println(correct[y]);
+				}
 				for(int j=0; j<answ.length; j++)
 				{
 
@@ -121,9 +126,16 @@ public class Make_Assignment_Servlet extends HttpServlet {
 
 					boolean c=false;
 					if(correct != null){
-						for(int x=0; x<correct.length && c==false; x++)
+						for(int x=0; x<correct.length; x++)
 						{
-							c=(Integer.parseInt(correct[x]) == j+1) ? true : false;
+							if(c==false)
+							{
+								char letter=correct[x].charAt(correct[x].length()-1);
+								int question=Integer.parseInt(correct[x].substring(0, correct[x].length()-1));
+								System.out.println("answer question: "+question+" i: "+i);
+								c=(letter == answ[j] && question == i+1) ? true : false;
+								System.out.println("CORRECT: "+correct[x]+" answ: "+answ[j]+" j: "+j+" c: "+c);
+							}
 						}
 					}
 					System.out.println("after correct: "+c);
@@ -145,13 +157,15 @@ public class Make_Assignment_Servlet extends HttpServlet {
 			}
 
 			String[] deleted=(String[])request.getParameterValues("delete");
-			for(int y=0; y<deleted.length; y++)
-			{
-				System.out.println("DELETED "+deleted[y]);
-				try{
-					System.out.println(sql.executeUpdate("DELETE FROM questions WHERE assignmentID="+assignmentid+" AND prompt='"+deleted[y].trim()+"'"));
-					sql.executeUpdate("DELETE FROM answers WHERE assignmentID="+assignmentid+" AND prompt='"+deleted[y].trim()+"'");
-				}catch(SQLException e){ System.out.println("ERROR inserting into questions: "+e); }
+			if(deleted != null){
+				for(int y=0; y<deleted.length; y++)
+				{
+					System.out.println("DELETED "+deleted[y]);
+					try{
+						System.out.println(sql.executeUpdate("DELETE FROM questions WHERE assignmentID="+assignmentid+" AND prompt='"+deleted[y].trim()+"'"));
+						sql.executeUpdate("DELETE FROM answers WHERE assignmentID="+assignmentid+" AND prompt='"+deleted[y].trim()+"'");
+					}catch(SQLException e){ System.out.println("ERROR inserting into questions: "+e); }
+				}
 			}
 
 			//redirect to professor assignment servlet

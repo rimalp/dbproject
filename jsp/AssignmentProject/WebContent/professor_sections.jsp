@@ -68,7 +68,7 @@ a {text-decoration: none;}
 							Sections
 							</b></th>
 							<th align="left"><b>
-							Next Due Date
+							Number of Students
 							</b></th>
 							<th align="left"><b>
 							Active Assignments

@@ -70,7 +70,7 @@ a {text-decoration: none;}
 							Active Assignments
 							</b></th>
 							<th align="left"><b>
-							Deadline
+							Number of Students
 							</b></th>
 						</tr>
 						
