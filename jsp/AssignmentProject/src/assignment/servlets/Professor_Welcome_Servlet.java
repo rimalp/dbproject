@@ -72,17 +72,28 @@ public class Professor_Welcome_Servlet extends HttpServlet {
 			String numStudents="SELECT CRN, COUNT(DISTINCT email) AS num FROM takes WHERE CRN IN (SELECT CRN FROM teaches WHERE email='"+email+"') GROUP BY CRN";
 			
 			query="SELECT course, num, COUNT(DISTINCT assignmentID), MIN(to_date(deadline, 'YYYY-MM-DD'))::TEXT, teaches.CRN FROM ("+numStudents+") studentCount, sections, assignments, teaches WHERE studentCount.CRN=sections.CRN AND sections.CRN=teaches.CRN AND teaches.CRN=assignments.CRN AND teaches.email='"+email+"' AND to_date(deadline, 'YYYY-MM-DD') > CURRENT_DATE GROUP BY course, teaches.CRN, num ORDER BY course";
+			//query="SELECT course, num, COUNT(DISTINCT assignmentID), teaches.CRN FROM ("+numStudents+") studentCount, sections, assignments, teaches WHERE studentCount.CRN=sections.CRN AND sections.CRN=teaches.CRN AND teaches.CRN=assignments.CRN AND teaches.email='"+email+"' GROUP BY course, teaches.CRN, num ORDER BY course";
 			rs=queryDB(query);
 			
 			String[][] sectionData = fillData(rs);
-			for(int i=0; i<sectionData.length && sectionData[i][0] != null; i++)
-			{
-				for(int j=0; j<sectionData[i].length; j++)
+			
+			
+			
+			ResultSet old=queryDB("SELECT course, num, COUNT(DISTINCT assignmentID), MIN(to_date(deadline, 'YYYY-MM-DD'))::TEXT, teaches.CRN FROM ("+numStudents+") studentCount, sections, assignments, teaches WHERE studentCount.CRN=sections.CRN AND sections.CRN=teaches.CRN AND teaches.CRN=assignments.CRN AND teaches.email='"+email+"' AND to_date(deadline, 'YYYY-MM-DD') <= CURRENT_DATE GROUP BY course, teaches.CRN, num ORDER BY course");
+			fillMoreData(old, sectionData);
+			
+			/*ResultSet due=queryDB("SELECT teaches.CRN, MIN(to_date(deadline, 'YYYY-MM-DD'))::TEXT, course FROM ("+numStudents+") studentCount, assignments, teaches, sections WHERE to_date(deadline, 'YYYY-MM-DD') > CURRENT_DATE AND sections.CRN=teaches.CRN AND teaches.email='"+email+"' AND studentCount.CRN=teaches.CRN AND assignments.CRN=teaches.CRN GROUP BY course, teaches.CRN, num ORDER BY course");
+			String[] min=new String[10];
+			try{
+				int w=0;
+				while(due.next())
 				{
-					System.out.print("AAAAAAAAA: "+sectionData[i][j]);
+					min[w]=due.getString(2);
+					w++;
 				}
-				System.out.println();
-			}
+			}catch(Exception e){ System.out.println("ERROR: "+e); }
+			*/
+			
 			//get sections with no assignments
 			ResultSet noAssignments=queryDB("SELECT course, num, teaches.CRN FROM ("+numStudents+") studentCount, sections, teaches WHERE studentCount.CRN=teaches.CRN AND sections.CRN=teaches.CRN AND teaches.email='"+email+"' AND NOT EXISTS (SELECT assignmentID FROM assignments WHERE assignments.CRN=teaches.CRN) GROUP BY course, teaches.CRN, num ORDER BY course");
 			String[][] empty=fillEmpty(noAssignments);
@@ -174,6 +185,42 @@ public class Professor_Welcome_Servlet extends HttpServlet {
 		
 	}
 
+	private String[][] fillMoreData(ResultSet rs, String[][] a)
+	{
+		//get next index
+		int j=0;
+		while(a[j][0]!=null){ j++; }
+		try{
+			int i=j+1;
+			while(rs.next())
+			{
+				String crn=rs.getString(5);
+				if(!duplicatesExist2(a, crn))
+				{
+					//System.out.println("HERGERGEG: "+count.getString(1));
+					a[i][0]=rs.getString(1);
+					a[i][1]=Integer.toString(rs.getInt(2));
+					a[i][2]=Integer.toString(rs.getInt(3));
+					a[i][3]=rs.getString(4);
+					a[i][4]=crn;
+					i++;
+				}
+			}
+		}catch(SQLException e) { System.out.println("SQLEXCEPTION: "+e); }
+		return a;
+	}
+	
+	private boolean duplicatesExist2(String[][] a, String crn)
+	{
+		for(int i=0; i<a.length && a[i][0]!=null; i++)
+		{
+			if(a[i][4].equals(crn))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
 	private String[][] fillEmptyAssignments(ResultSet rs, String[][] a)
 	{
 		//et next empty spot in a
@@ -242,25 +289,40 @@ public class Professor_Welcome_Servlet extends HttpServlet {
 		return r;
 	}
 	
+	private boolean duplicatesExist(String[][] a, String crn)
+	{
+		for(int i=0; i<a.length && a[i][0]!=null; i++)
+		{
+			if(a[i][4].equals(crn))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
 	/*
 	 * fills the section data for professors appropriately
 	 */
 	private String[][] fillData(ResultSet rs)
 	{
 		//display course names, num students, active assignment count, next due date, section crn for links
-		String[][] r=new String[10][5];
+		String[][] r=new String[10][6];
 		
 		try{
 			int i=0;
 			while(rs.next())
 			{
-				//System.out.println("HERGERGEG: "+count.getString(1));
-				r[i][0]=rs.getString(1);
-				r[i][1]=Integer.toString(rs.getInt(2));
-				r[i][2]=Integer.toString(rs.getInt(3));
-				r[i][3]=rs.getString(4);
-				r[i][4]=rs.getString(5);
-				i++;
+				String crn=rs.getString(5);
+				//if(!duplicatesExist(r, crn))
+				//{
+					//System.out.println("HERGERGEG: "+count.getString(1));
+					r[i][0]=rs.getString(1);
+					r[i][1]=Integer.toString(rs.getInt(2));
+					r[i][2]=Integer.toString(rs.getInt(3));
+					r[i][4]=rs.getString(4);//date
+					r[i][5]=crn;
+					i++;
+				//}
 			}
 		}catch(SQLException e) { System.out.println("SQLEXCEPTION: "+e); }
 		
@@ -269,7 +331,7 @@ public class Professor_Welcome_Servlet extends HttpServlet {
 	
 	/**
 	 * queries the database with the given string interpreted as an sql statement...
-	 * returns a resultset as the result of the query to the database
+	 * returns a resultset rs.getString(5)as the result of the query to the database
 	 */
 	private ResultSet queryDB(String query)
 	{

@@ -81,14 +81,14 @@ a {text-decoration: none;}
 							<% String[][] data = (String[][])request.getAttribute("sectionData");
 							String[][] empty=(String[][])request.getAttribute("empty");
 							for(int i=0; i<data.length; i++){
-							if(data[i][0] != null){%>
+							if(data[i][0] != null && data[i][4] != null && data[i][3] != null){%>
 							<tr>
 								<td class="centertable normalfont">
 								<% out.println("<a href=\"professor_section_servlet_path?id="+data[i][4]+"\">"+data[i][0]+"</a>");%>
 								</td>
 								<td class="centertable normalfont"><% out.println(data[i][1]); %></td>
 								<td class="centertable normalfont"><% out.println(data[i][2]); %></td>
-								<td class="centertable normalfont"><% if(data[i][2] != null) {
+								<td class="centertable normalfont"><% if(data[i][3] != null) {
 									out.println(data[i][3]); 
 									}%></td>
 							</tr>

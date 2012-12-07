@@ -320,11 +320,11 @@ public class Make_Assignment_Servlet extends HttpServlet {
 				char[] answ={'a','b','c','d'};
 				String[] correct=(String[])request.getParameterValues("correct");
 				System.out.println("CORRECT ARRAY");
-				for (int x=0; x<correct.length; x++)
+				for (int x=0; correct != null && x<correct.length; x++)
 				{
 					System.out.println("correct: "+correct[x]);
 				}
-				for(int j=0; j<answ.length; j++)
+				for(int j=0; j<answ.length && correct != null; j++)
 				{
 					System.out.println("answer: "+(String)request.getParameter("answer"+i+answ[j]));
 					answerID++;
