@@ -65,7 +65,7 @@ Database Project
 <hr/>
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<b class="headerfont"><% //out.println(info[0]); %></b><br/><br/>
+<b class="headerfont"><% //out.println(info[0]);%></b><br/><br/>
 
 
 <table>

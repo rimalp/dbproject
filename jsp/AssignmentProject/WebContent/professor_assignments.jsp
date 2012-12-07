@@ -82,10 +82,10 @@ a {text-decoration: none;}
 							Description
 							</b></th>
 							<th  class="centerable bigfont" align="left"><b>
-							Deadline
+							Completed
 							</b></th>
 							<th  class="centerable bigfont" align="left"><b>
-							Completed
+							Deadline
 							</b></th>
 						</tr>
 						

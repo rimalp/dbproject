@@ -84,13 +84,13 @@ a {text-decoration: none;}
 				<table>
 				<tr>
 				<td style="padding-left: 10 px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Mark any correct answers:</td>
-				<td style="padding-left: 10 px">a)<input type="checkbox" name="correct" value="1"></td>
-				<td style="padding-left: 10 px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;b)<input type="checkbox" name="correct" value="2"></td>
+				<td style="padding-left: 10 px">a)<input type="checkbox" name="correct" value="<% out.print(i+1); %>a"></td>
+				<td style="padding-left: 10 px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;b)<input type="checkbox" name="correct" value="<% out.print(i+1); %>b"></td>
 				</tr>
 				<tr>
 				<td></td>
-				<td style="padding-left: 10 px">c)<input type="checkbox" name="correct" value="3"></td>
-				<td style="padding-left: 10 px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;d)<input type="checkbox" name="correct" value="4"></td>
+				<td style="padding-left: 10 px">c)<input type="checkbox" name="correct" value="<% out.print(i+1); %>c"></td>
+				<td style="padding-left: 10 px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;d)<input type="checkbox" name="correct" value="<% out.print(i+1); %>d"></td>
 				</tr>
 				</table>
 				<br>
