@@ -98,8 +98,8 @@ a {text-decoration: none;}
 							<% out.println("<a href=\"professor_assignment_servlet_path?id="+data[i][5]+"\">"+data[i][0]+"</a>"); %>
 							</td>
 							<td class="centertable normalfont"><% out.println(data[i][1]); %></td>
-							<td class="centertable normalfont"><% out.println(data[i][2]); %></td>
-							<td class="centertable normalfont"><% out.println(data[i][3]+"/"+data[i][4]); %></td>
+							<td class="centertable normalfont"><% out.println(data[i][2]+"/"+data[i][4]); %></td>
+							<td class="centertable normalfont"><% out.println(data[i][3]); %></td>
 							</tr>
 							<%}
 							}%>
@@ -125,10 +125,10 @@ a {text-decoration: none;}
 							Description
 							</b></th>
 							<th  class="centerable bigfont" align="left"><b>
-							Deadline
+							Completed
 							</b></th>
 							<th  class="centerable bigfont" align="left"><b>
-							Completed
+							Deadline
 							</b></th>
 						</tr>
 						
@@ -140,8 +140,8 @@ a {text-decoration: none;}
 							<% out.println("<a href=\"professor_assignment_servlet_path?id="+data[i][5]+"\">"+data[i][0]+"</a>"); %>
 							</td>
 							<td class="centertable normalfont"><% out.println(data[i][1]); %></td>
-							<td class="centertable normalfont"><% out.println(data[i][2]); %></td>
-							<td class="centertable normalfont"><% out.println(data[i][3]+"/"+data[i][4]); %></td>
+							<td class="centertable normalfont"><% out.println(data[i][2]+"/"+data[i][4]); %></td>
+							<td class="centertable normalfont"><% out.println(data[i][3]); %></td>
 						</tr>
 						<%}
 						}%>
