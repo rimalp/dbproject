@@ -1,3 +1,87 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<head>
+<% String[][] grades = (String[][])request.getAttribute("grades");
+%>
+<title>
+Grades
+</title>
+
+<link type="text/css" rel="stylesheet" href="css/bootstrap.css" />
+<link type="text/css" rel="stylesheet" href="css/bootstrap-responsive.css" />
+</head>
+<body class="bodybackground" style="margin-top: 0; margin-left: 0; margin-bottom: 4px; margin-right: 4px">
+
+
+<div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+      <div class="container">
+        <p class="brand" align="left">The Assignment Project</p>
+        <div class="nav-collapse">
+           <p align="right"> Signed in as <% String e = (String)request.getSession().getAttribute("name"); out.println(e); %></p>
+           <p class="text-info" align="right">
+           <a class="text-info" href="loginpath?id=logout_link">Logout</a>
+           </p>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  
+  <div class="container-fluid span15">
+
+	<div class="row-fluid">
+		<div class="span2">
+			<%@ include file="professor_left_links.jsp"%>
+		</div>
+			<div class="span10" style="padding-top: 100px; border: 2px; border-left-style: solid; border-color: #3399FF; margin: 10px; height: 100%; overflow:auto">
+				
+				
+				<table>					
+						<tr valign="middle">						
+						<td valign="middle" class="lightbackgroundwithnormalfont" style="width:100%;">
+						<table class="table table-striped">
+							<tr>
+							<td class="centertable text-info">
+							Assignment Name
+							</td>
+							<td class="centertable text-info">
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							Score
+							</td>
+							</tr>
+							<% for(int i=0; i<grades.length && grades[i][0] != null; i++){ %>
+							<tr>
+							<td class="centertable normalfont">
+							<% out.println(grades[i][1]);%>
+							</td>
+							<td class="centertable normalfont">
+							<% out.println(Double.parseDouble(grades[i][0])*100); %>
+							</td>
+							</tr>
+							<%} %>
+						</table>
+						
+						</td>
+						</tr>
+				</table>
+				<br><br>			
+				
+			</div>
+		</div>
+</div>
+
+
+
+</body>
+</html>
+
+
+
+<%-- 
+
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
@@ -110,4 +194,4 @@ Score
 </tr>
 </table>
 </body>
-</html>
+</html> --%>
