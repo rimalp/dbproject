@@ -73,10 +73,28 @@ public class LoginServlet extends HttpServlet {
 		
 		//for professor want course, active assignments, number of students, (crns of sections for links)
 		String countQuery = "SELECT course, COUNT(DISTINCT assignmentID), num, sections.CRN FROM ("+numStudentsQuery+") studentCount, sections, teaches, takes, assignments WHERE studentCount.CRN=teaches.CRN AND sections.CRN=teaches.CRN AND assignments.CRN=teaches.CRN AND teaches.email='"+username+"' AND to_date(deadline, 'YYYY-MM-DD') > CURRENT_DATE GROUP BY course, sections.CRN, num";
+		//String countQuery = "SELECT course, num, sections.CRN FROM ("+numStudentsQuery+") studentCount, sections, teaches, takes, assignments WHERE studentCount.CRN=teaches.CRN AND sections.CRN=teaches.CRN AND assignments.CRN=teaches.CRN AND teaches.email='"+username+"' GROUP BY course, sections.CRN, num";
 		ResultSet assignmentCount = queryDB(countQuery);
 
 		String[][] data = addStudentCount(assignmentCount);
 		
+		ResultSet t=queryDB("SELECT course, COUNT(DISTINCT assignmentID), num, sections.CRN FROM ("+numStudentsQuery+") studentCount, sections, teaches, takes, assignments WHERE studentCount.CRN=teaches.CRN AND sections.CRN=teaches.CRN AND assignments.CRN=teaches.CRN AND teaches.email='"+username+"' AND to_date(deadline, 'YYYY-MM-DD') <= CURRENT_DATE GROUP BY course, sections.CRN, num");
+		addMore(t, data);
+		
+		//ResultSet due=queryDB("SELECT MIN(to_date(deadline, 'YYYY-MM-DD'))::TEXT FROM ("+numStudentsQuery+") studentCount, assignments, teaches WHERE to_date(deadline, 'YYYY-MM-DD') > CURRENT_DATE AND teaches.email='"+username+"' AND studentCount.CRN=teaches.CRN AND assignments.CRN=teaches.CRN");
+		//ResultSet due=queryDB("SELECT COUNT(DISTINCT assignmentID), sections.CRN, course FROM ("+numStudentsQuery+") studentCount, sections, teaches, takes, assignments WHERE studentCount.CRN=teaches.CRN AND sections.CRN=teaches.CRN AND assignments.CRN=teaches.CRN AND teaches.email='"+username+"' AND to_date(deadline, 'YYYY-MM-DD') > CURRENT_DATE GROUP BY course, sections.CRN, num");
+		//ResultSet due=queryDB("SELECT course, COUNT(DISTINCT assignmentID), num, sections.CRN FROM ("+numStudentsQuery+") studentCount, sections, teaches, takes, assignments WHERE studentCount.CRN=teaches.CRN AND sections.CRN=teaches.CRN AND assignments.CRN=teaches.CRN AND teaches.email='"+username+"' AND to_date(deadline, 'YYYY-MM-DD') > CURRENT_DATE GROUP BY course, sections.CRN, num");
+		ResultSet due=queryDB("SELECT COUNT(DISTINCT assignmentID) FROM assignments, teaches WHERE to_date(deadline, 'YYYY-MM-DD') > CURRENT_DATE AND teaches.email='"+username+"' AND teaches.CRN=assignments.CRN");
+		String[] min=new String[10];
+		try{
+			int w=0;
+			while(due.next())
+			{
+				min[w]=due.getString(1);
+				System.out.println("MIN: "+min[w]+" :"+due.getString(1));
+				w++;
+			}
+		}catch(Exception e){ System.out.println("ERROR: "+e); }
 		/*System.out.println("TESTSTSTSTSTS");
 		//test print for this data
 		for(int i=0; i<data.length && data[0][0] != null; i++)
@@ -89,12 +107,50 @@ public class LoginServlet extends HttpServlet {
 		String[][] empty = fillEmpty(emptyAssignments);
 		
 		try{
+			request.setAttribute("min", min);
 			request.setAttribute("empty", empty);
 			request.setAttribute("data", data);
 			request.getRequestDispatcher("professor_welcome.jsp").forward(request, response);
 		}catch(IOException e) { System.out.println("ioexception: "+e); }
 		catch (ServletException e) { System.out.println("servlet exception: "+e); }
 		
+	}
+	
+	private boolean duplicateExists(String[][] a, String crn)
+	{
+		for(int i=0; i<a.length && a[i][0]!=null; i++)
+		{
+			if(a[i][3].equals(crn))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	private String[][] addMore(ResultSet rs, String[][] a)
+	{
+		//get next index
+		int j=0;
+		while(a[j][0]!=null){ j++; }
+		try{
+			int i=j+1;
+			while(rs.next())
+			{
+				String crn=rs.getString(4);
+				if(!duplicateExists(a, crn))
+				{
+					//System.out.println("HERGERGEG: "+count.getString(1));
+					a[i][0]=rs.getString(1);
+					a[i][1]=Integer.toString(rs.getInt(2));
+					a[i][2]=Integer.toString(rs.getInt(3));
+					a[i][3]=crn;
+					i++;
+				}
+			}
+		}catch(SQLException e) { System.out.println("SQLEXCEPTION: "+e); }
+		
+		return a;
 	}
 	
 	private String[][] fillEmpty(ResultSet rs)

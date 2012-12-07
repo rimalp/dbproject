@@ -60,7 +60,8 @@ a {text-decoration: none;}
 					<br><br>
 						
 					<% String[][] data=(String[][])request.getAttribute("data");
-					   String[][] empty=(String[][])request.getAttribute("empty"); %>
+					   String[][] empty=(String[][])request.getAttribute("empty"); 
+					   String[] min=(String[])request.getAttribute("min");%>
 						
 					<table class="table table-striped" border="0" cellpadding="0" cellspacing="9" style="width:75%">
 						<tr class="text-info">
@@ -82,7 +83,7 @@ a {text-decoration: none;}
 							<% out.print("<a href=\"professor_section_servlet_path?id="+data[i][3]+"\">"+data[i][0]+"</a>");%>
 							</td>
 							<td align="center" class="centerable normalfont">
-							<% out.print(data[i][1]); %>
+							<% out.print(data[i][1]);//out.print(min[i]); %>
 							</td>
 							<td align="right" class="centerable">
 							<% out.print(data[i][2]); %>
