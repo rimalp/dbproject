@@ -44,7 +44,7 @@ Grades
 						<td valign="middle" class="lightbackgroundwithnormalfont" style="width:100%;">
 						<table class="table table-striped">
 							<tr>
-							<td class="centertable text-info">
+							<td class="centertable text-info span9">
 							Assignment Name
 							</td>
 							<td class="centertable text-info">
