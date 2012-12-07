@@ -141,6 +141,7 @@ public class Make_Assignment_Servlet extends HttpServlet {
 					System.out.println("after correct: "+c);
 
 					try{
+						System.out.println("update... content: "+(String)request.getParameter("answer"+i+answ[j])+" prompt: "+newPrompt+" correct: "+c+" answerid: "+answerID);
 						sql.executeUpdate("UPDATE answers SET content='"+(String)request.getParameter("answer"+i+answ[j])+"', prompt='"+newPrompt+"', correct="+c+" WHERE answerID="+answerID);
 					}catch(SQLException e){ System.out.println("ERROR: "+e); }
 					System.out.println("after update");
@@ -305,6 +306,7 @@ public class Make_Assignment_Servlet extends HttpServlet {
 			//System.out.println(qs+"     "+assignmentid);
 			//add the questions to the database
 			//System.out.println("22222222222222222222222222222222222222222222222222222");
+			
 			int answerID=0;
 			for(int i=0; i<Integer.parseInt(qs); i++)
 			{
@@ -317,6 +319,11 @@ public class Make_Assignment_Servlet extends HttpServlet {
 
 				char[] answ={'a','b','c','d'};
 				String[] correct=(String[])request.getParameterValues("correct");
+				System.out.println("CORRECT ARRAY");
+				for (int x=0; x<correct.length; x++)
+				{
+					System.out.println("correct: "+correct[x]);
+				}
 				for(int j=0; j<answ.length; j++)
 				{
 					System.out.println("answer: "+(String)request.getParameter("answer"+i+answ[j]));
@@ -326,9 +333,17 @@ public class Make_Assignment_Servlet extends HttpServlet {
 					if(correct != null){
 						for(int x=0; x<correct.length && c==false; x++)
 						{
-							c=(Integer.parseInt(correct[x]) == j+1) ? true : false;
+							if(c==false)
+							{
+								char letter=correct[x].charAt(correct[x].length()-1);
+								int question=Integer.parseInt(correct[x].substring(0, correct[x].length()-1));
+								System.out.println("answer question: "+question+" i: "+i);
+								c=(letter == answ[j] && question == i+1) ? true : false;
+								System.out.println("CORRECT: "+correct[x]+" answ: "+answ[j]+" j: "+j+" c: "+c);
+								}
 						}
 					}
+//SADFKSDGFKDFGDKFGKDFKGDKFGKDFKGDKFGKDFGKDF
 
 					try{
 						sql.executeUpdate("INSERT INTO answers VALUES("+answerID+", '"+(String)request.getParameter("answer"+i+answ[j])+"', "+assignmentid+", '"+prompt+"', "+c+")");

@@ -114,9 +114,23 @@ public class Professor_Welcome_Servlet extends HttpServlet {
 			
 			
 			String countTotal="SELECT CRN, COUNT(DISTINCT email) AS num FROM takes WHERE CRN IN (SELECT CRN FROM teaches WHERE email='"+email+"') GROUP BY CRN";
+			ResultSet a=queryDB(countTotal);
+			try{
+				while(a.next())
+				{
+					System.out.println("count total: "+a.getString(1)+" "+a.getInt(2));
+				}
+			}catch(Exception e){ System.out.println("ERROR: "+e); }
 			
 			//get number of students who have completed the assignment from the table assigned
 			String countCompleted="SELECT teaches.CRN, COUNT(DISTINCT assigned.email) AS completed FROM assigned, teaches, assignments WHERE assignments.assignmentID=assigned.assignmentID AND teaches.CRN=assignments.CRN AND teaches.email='"+email+"' GROUP BY teaches.CRN";
+			ResultSet b=queryDB(countCompleted);
+			try{
+				while(b.next())
+				{
+					System.out.println("count completed: "+b.getString(1)+" "+b.getInt(2));
+				}
+			}catch(Exception e){ System.out.println("ERROR: "+e); }
 			
 			//display course names, description, deadline, num completed / total in section, assignmentid for links
 			//current assignments
@@ -124,10 +138,27 @@ public class Professor_Welcome_Servlet extends HttpServlet {
 			rs=queryDB(query);
 			String[][] activeAssignmentData = fillAssignmentData(rs);
 			
+			for(int i=0; i<activeAssignmentData.length && activeAssignmentData[i][0]!=null; i++)
+			{
+				System.out.println("ACTIVE: "+activeAssignmentData[i][0]);
+			}
+			
 			//old assignments
 			query="SELECT name, description, to_date(deadline, 'YYYY-MM-DD'), completed, num, assignments.assignmentID FROM ("+countTotal+") studentTotal, ("+countCompleted+") studentCompleted, assignments, teaches WHERE assignments.assignmentID IN (SELECT DISTINCT assignmentID FROM questions) AND teaches.email='"+email+"' AND studentCompleted.CRN=teaches.CRN AND studentTotal.CRN=teaches.CRN AND teaches.CRN=assignments.CRN AND to_date(deadline, 'YYYY-MM-DD') < CURRENT_DATE ORDER BY deadline ASC";
 			rs=queryDB(query);
 			String[][] oldAssignmentData = fillAssignmentData(rs);
+			
+			for(int i=0; i<oldAssignmentData.length && oldAssignmentData[i][0]!=null; i++)
+			{
+				System.out.println("ACTIVE: "+oldAssignmentData[i][0]);
+			}
+			
+			//put assignments completed by noone into appropriate array
+			ResultSet f=queryDB("SELECT name, description, to_date(deadline, 'YYYY-MM-DD'), num, assignments.assignmentID FROM ("+countTotal+") studentTotal, assignments, teaches WHERE NOT EXISTS (SELECT * FROM ("+countCompleted+") studentCompleted WHERE studentCompleted.CRN=teaches.CRN AND teaches.email='"+email+"') AND assignments.assignmentID IN (SELECT DISTINCT assignmentID FROM questions) AND teaches.email='"+email+"' AND studentTotal.CRN=teaches.CRN AND teaches.CRN=assignments.CRN AND to_date(deadline, 'YYYY-MM-DD') >= CURRENT_DATE ORDER BY deadline ASC");
+			String[][] activeEmpty=fillEmptyAssignments(f, activeAssignmentData);
+			
+			ResultSet g=queryDB("SELECT name, description, to_date(deadline, 'YYYY-MM-DD'), num, assignments.assignmentID FROM ("+countTotal+") studentTotal, assignments, teaches WHERE NOT EXISTS (SELECT * FROM ("+countCompleted+") studentCompleted WHERE studentCompleted.CRN=teaches.CRN AND teaches.email='"+email+"') AND assignments.assignmentID IN (SELECT DISTINCT assignmentID FROM questions) AND teaches.email='"+email+"' AND studentTotal.CRN=teaches.CRN AND teaches.CRN=assignments.CRN AND to_date(deadline, 'YYYY-MM-DD') < CURRENT_DATE ORDER BY deadline ASC");
+			String[][] oldEmpty=fillEmptyAssignments(g, oldAssignmentData);
 			
 			try{
 				request.setAttribute("assignmentCurrentData", activeAssignmentData);
@@ -143,6 +174,29 @@ public class Professor_Welcome_Servlet extends HttpServlet {
 		
 	}
 
+	private String[][] fillEmptyAssignments(ResultSet rs, String[][] a)
+	{
+		//et next empty spot in a
+		int j=0;
+		while(a[j][0]!=null){ j++; }
+		try{
+			int i=j+1;
+			while(rs.next())
+			{
+				//System.out.println("fillempty: "+rs.getString(1));
+				a[i][0]=rs.getString(1);
+				a[i][1]=rs.getString(2);
+				a[i][2]="0";
+				a[i][3]=rs.getString(3);
+				a[i][4]=Integer.toString(rs.getInt(4));
+				a[i][5]=Integer.toString(rs.getInt(5));
+				i++;
+			}
+		}catch(SQLException e) { System.out.println("SQLEXCEPTION: "+e); }
+		
+		return a;
+	}
+	
 	private String[][] fillEmpty(ResultSet rs)
 	{
 		String[][] r=new String[50][3];
